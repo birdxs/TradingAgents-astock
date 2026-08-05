@@ -36,123 +36,206 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Custom CSS ───────────────────────────────────────────────────────────────
+# ── Theme configuration ───────────────────────────────────────────────────────
 
-st.markdown(
-    """
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+# 主题配色方案
+_THEMES = {
+    "light": {
+        "bg": "#ffffff",
+        "sidebar_bg": "#f5f5f5",
+        "text": "#1a1a1a",
+        "text_secondary": "#666666",
+        "border": "#e0e0e0",
+        "input_bg": "#ffffff",
+        "input_border": "#d0d0d0",
+        "button_secondary_bg": "#f5f5f5",
+        "button_secondary_border": "#d0d0d0",
+        "button_secondary_hover": "#e8e8e8",
+    },
+    "dark": {
+        "bg": "#0a0a0a",
+        "sidebar_bg": "#0f0f0f",
+        "text": "#f5f1eb",
+        "text_secondary": "#888888",
+        "border": "#1a1a1a",
+        "input_bg": "#161616",
+        "input_border": "#2a2a2a",
+        "button_secondary_bg": "#161616",
+        "button_secondary_border": "#2a2a2a",
+        "button_secondary_hover": "#1e1e1e",
+    },
+}
 
-    /* Hide Streamlit chrome for clean video recording.
-       IMPORTANT: do NOT `display:none` the whole header OR the whole toolbar.
-       In Streamlit >= 1.36 the "expand sidebar" button lives *inside* the
-       toolbar (header > stToolbar > stExpandSidebarButton), so hiding either
-       one makes a collapsed sidebar impossible to reopen (issue #36). Instead
-       keep the header/toolbar in the DOM, make the header transparent, and
-       hide only the individual chrome widgets we don't want on camera. */
-    #MainMenu,
-    footer,
-    div[data-testid="stDecoration"],
-    div[data-testid="stStatusWidget"],
-    div[data-testid="stToolbarActions"],
-    div[data-testid="stAppDeployButton"],
-    span[data-testid="stMainMenu"] { display: none !important; }
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-    /* Keep the sidebar collapse / expand controls always visible & clickable.
-       Selector list spans multiple Streamlit versions. */
-    button[data-testid="stExpandSidebarButton"],
-    button[data-testid="stSidebarCollapseButton"],
-    button[data-testid="collapsedControl"],
-    [data-testid="stSidebarCollapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
+# 初始化主题状态
+if "theme" not in st.session_state:
+    st.session_state["theme"] = "light"
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, sans-serif;
-    }
-    .stApp {
-        background: #0a0a0a;
-    }
-    section[data-testid="stSidebar"] {
-        background: #0f0f0f;
-        border-right: 1px solid #1a1a1a;
-    }
-    .stMetric label { color: #888 !important; font-size: 0.8rem !important; }
-    .stMetric [data-testid="stMetricValue"] {
-        color: #ff5a1f !important;
-        font-weight: 700 !important;
-    }
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #ff5a1f, #ff8c42) !important;
-    }
-    button[kind="primary"] {
-        background: linear-gradient(135deg, #ff5a1f, #ff8c42) !important;
-        border: none !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.05em !important;
-        box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
-        transition: all 0.2s ease !important;
-    }
-    button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #e04d15, #ff5a1f) !important;
-        box-shadow: 0 6px 20px rgba(255,90,31,0.4) !important;
-        transform: translateY(-1px) !important;
-    }
-    /* Secondary buttons (history items) */
-    button[kind="secondary"] {
-        background: #161616 !important;
-        border: 1px solid #2a2a2a !important;
-        color: #ccc !important;
-        transition: all 0.2s ease !important;
-    }
-    button[kind="secondary"]:hover {
-        background: #1e1e1e !important;
-        border-color: #ff5a1f !important;
-        color: #ff5a1f !important;
-    }
-    .stExpander {
-        border: 1px solid #222 !important;
-        border-radius: 8px !important;
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: #888 !important;
-    }
-    .stTabs [aria-selected="true"] {
-        color: #ff5a1f !important;
-        border-bottom-color: #ff5a1f !important;
-    }
-    div[data-testid="stDownloadButton"] button {
-        background: #1a1a2e !important;
-        border: 1px solid #ff5a1f !important;
-        color: #ff5a1f !important;
-    }
-    /* Text input styling */
-    input[data-testid="stTextInputRootElement"] input,
-    .stTextInput input {
-        background: #161616 !important;
-        border-color: #2a2a2a !important;
-        color: #f5f1eb !important;
-    }
-    .stTextInput input:focus {
-        border-color: #ff5a1f !important;
-        box-shadow: 0 0 0 1px #ff5a1f !important;
-    }
-    /* Date input styling */
-    .stDateInput input {
-        background: #161616 !important;
-        border-color: #2a2a2a !important;
-        color: #f5f1eb !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+def _get_theme() -> dict:
+    """获取当前主题配色"""
+    return _THEMES.get(st.session_state.get("theme", "light"), _THEMES["light"])
 
+def _render_theme_css() -> None:
+    """渲染主题相关的 CSS（使用 CSS 变量）"""
+    theme = _get_theme()
+    st.markdown(
+        f"""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        /* CSS 变量定义 */
+        :root {{
+            --bg: {theme['bg']};
+            --sidebar-bg: {theme['sidebar_bg']};
+            --text: {theme['text']};
+            --text-secondary: {theme['text_secondary']};
+            --border: {theme['border']};
+            --input-bg: {theme['input_bg']};
+            --input-border: {theme['input_border']};
+            --button-secondary-bg: {theme['button_secondary_bg']};
+            --button-secondary-border: {theme['button_secondary_border']};
+            --button-secondary-hover: {theme['button_secondary_hover']};
+        }}
+
+        /* Hide Streamlit chrome for clean video recording.
+           IMPORTANT: do NOT `display:none` the whole header OR the whole toolbar.
+           In Streamlit >= 1.36 the "expand sidebar" button lives *inside* the
+           toolbar (header > stToolbar > stExpandSidebarButton), so hiding either
+           one makes a collapsed sidebar impossible to reopen (issue #36). Instead
+           keep the header/toolbar in the DOM, make the header transparent, and
+           hide only the individual chrome widgets we don't want on camera. */
+        #MainMenu,
+        footer,
+        div[data-testid="stDecoration"],
+        div[data-testid="stStatusWidget"],
+        div[data-testid="stToolbarActions"],
+        div[data-testid="stAppDeployButton"],
+        span[data-testid="stMainMenu"] {{ display: none !important; }}
+        header[data-testid="stHeader"] {{
+            background: transparent !important;
+            box-shadow: none !important;
+        }}
+        /* Keep the sidebar collapse / expand controls always visible & clickable.
+           Selector list spans multiple Streamlit versions. */
+        button[data-testid="stExpandSidebarButton"],
+        button[data-testid="stSidebarCollapseButton"],
+        button[data-testid="collapsedControl"],
+        [data-testid="stSidebarCollapsedControl"] {{
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }}
+
+        html, body, [class*="css"] {{
+            font-family: 'Inter', -apple-system, sans-serif;
+        }}
+        .stApp {{
+            background: var(--bg);
+        }}
+        section[data-testid="stSidebar"] {{
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+        }}
+        .stMetric label {{ color: var(--text-secondary) !important; font-size: 0.8rem !important; }}
+        .stMetric [data-testid="stMetricValue"] {{
+            color: #ff5a1f !important;
+            font-weight: 700 !important;
+        }}
+        .stProgress > div > div > div {{
+            background: linear-gradient(90deg, #ff5a1f, #ff8c42) !important;
+        }}
+        button[kind="primary"] {{
+            background: linear-gradient(135deg, #ff5a1f, #ff8c42) !important;
+            border: none !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.05em !important;
+            box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
+            transition: all 0.2s ease !important;
+        }}
+        button[kind="primary"]:hover {{
+            background: linear-gradient(135deg, #e04d15, #ff5a1f) !important;
+            box-shadow: 0 6px 20px rgba(255,90,31,0.4) !important;
+            transform: translateY(-1px) !important;
+        }}
+        /* Secondary buttons (history items) */
+        button[kind="secondary"] {{
+            background: var(--button-secondary-bg) !important;
+            border: 1px solid var(--button-secondary-border) !important;
+            color: var(--text) !important;
+            transition: all 0.2s ease !important;
+        }}
+        button[kind="secondary"]:hover {{
+            background: var(--button-secondary-hover) !important;
+            border-color: #ff5a1f !important;
+            color: #ff5a1f !important;
+        }}
+        .stExpander {{
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+        }}
+        .stTabs [data-baseweb="tab"] {{
+            color: var(--text-secondary) !important;
+        }}
+        .stTabs [aria-selected="true"] {{
+            color: #ff5a1f !important;
+            border-bottom-color: #ff5a1f !important;
+        }}
+        div[data-testid="stDownloadButton"] button {{
+            background: var(--sidebar-bg) !important;
+            border: 1px solid #ff5a1f !important;
+            color: #ff5a1f !important;
+        }}
+        /* Text input styling */
+        input[data-testid="stTextInputRootElement"] input,
+        .stTextInput input {{
+            background: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }}
+        .stTextInput input:focus {{
+            border-color: #ff5a1f !important;
+            box-shadow: 0 0 0 1px #ff5a1f !important;
+        }}
+        /* Date input styling */
+        .stDateInput input {{
+            background: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+def _render_theme_toggle() -> None:
+    """渲染主题切换按钮"""
+    current_theme = st.session_state.get("theme", "light")
+    is_dark = current_theme == "dark"
+    
+    # 使用两列布局放置切换按钮
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button(
+            label="🌙 暗黑" if not is_dark else "🌙 已切换暗黑",
+            key="theme_toggle_dark",
+            use_container_width=True,
+            type="secondary" if not is_dark else "primary",
+        ):
+            st.session_state["theme"] = "dark"
+            st.rerun()
+    with col2:
+        if st.button(
+            label="☀️ 明亮" if is_dark else "☀️ 已切换明亮",
+            key="theme_toggle_light",
+            use_container_width=True,
+            type="primary" if not is_dark else "secondary",
+        ):
+            st.session_state["theme"] = "light"
+            st.rerun()
+
+
+# ── Render theme CSS ─────────────────────────────────────────────────────────
+
+_render_theme_css()
 
 # ── Build config ─────────────────────────────────────────────────────────────
 
@@ -200,6 +283,9 @@ def _build_config() -> dict:
 
 with st.sidebar:
     render_sidebar()
+    # 在侧栏底部添加主题切换
+    st.markdown("---")
+    _render_theme_toggle()
 
 
 # ── Handle "Start Analysis" trigger ──────────────────────────────────────────
@@ -276,8 +362,9 @@ elif tracker and tracker.error:
 
 # State 0: Idle — welcome screen
 else:
+    theme = _get_theme()
     st.markdown(
-        """
+        f"""
         <div style="
             display: flex;
             flex-direction: column;
@@ -292,18 +379,18 @@ else:
                 font-weight: 900;
                 margin-bottom: 0.5rem;
             ">
-                <span style="color: #ff5a1f;">Trading</span><span style="color: #f5f1eb;">Agents</span><span style="color: #f5f1eb;">-</span><span style="color: #ff5a1f;">Astock</span>
+                <span style="color: #ff5a1f;">Trading</span><span style="color: {theme['text']};">Agents</span><span style="color: {theme['text']};">-</span><span style="color: #ff5a1f;">Astock</span>
             </div>
-            <div style="color: #888; font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
+            <div style="color: {theme['text_secondary']}; font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
                 A股多Agent投研分析系统<br>
                 7位AI分析师 → 质量门控 → 多空辩论 → 风控评估 → 最终决策
             </div>
             <div style="
                 margin-top: 2rem;
                 padding: 1rem 2rem;
-                border: 1px solid #222;
+                border: 1px solid {theme['border']};
                 border-radius: 12px;
-                color: #666;
+                color: {theme['text_secondary']};
                 font-size: 0.9rem;
             ">
                 ← 在左侧输入股票代码，开始分析
@@ -311,11 +398,11 @@ else:
             <div style="
                 margin-top: 2.5rem;
                 padding: 0.8rem 1.5rem;
-                color: #555;
+                color: {theme['text_secondary']};
                 font-size: 0.75rem;
                 max-width: 500px;
                 line-height: 1.6;
-                border-top: 1px solid #1a1a1a;
+                border-top: 1px solid {theme['border']};
             ">
                 ⚠️ 本项目仅供学习研究与技术演示，不构成任何投资建议。<br>
                 投资决策请咨询持牌专业机构。作者不对使用本工具产生的任何损失承担责任。

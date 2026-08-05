@@ -250,11 +250,11 @@ def render_sidebar() -> None:
     st.markdown(
         """
         <div style="text-align:center; margin-bottom:1.5rem;">
-            <span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Trading</span><span style="font-size:2rem; font-weight:800; color:#f5f1eb;">Agents</span><span style="font-size:2rem; font-weight:800; color:#f5f1eb;">-</span><span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Astock</span>
-            <div style="font-size:0.85rem; color:#888; margin-top:0.2rem;">
+            <span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Trading</span><span style="font-size:2rem; font-weight:800; color:var(--text);">Agents</span><span style="font-size:2rem; font-weight:800; color:var(--text);">-</span><span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Astock</span>
+            <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.2rem;">
                 A股多Agent投研系统
             </div>
-            <div style="font-size:0.7rem; color:#555; margin-top:0.3rem;">
+            <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:0.3rem;">
                 by <a href="https://github.com/simonlin1212" style="color:#ff5a1f; text-decoration:none;">simonlin1212</a>
             </div>
         </div>

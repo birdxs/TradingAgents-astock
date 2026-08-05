@@ -60,23 +60,24 @@ def render_report(
     stats_html = ""
     if elapsed is not None:
         m, s = divmod(int(elapsed), 60)
-        stats_html = f'<div style="font-size:0.9rem; color:#888; margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
+        stats_html = f'<div style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
 
+    # 信号卡片使用 CSS 变量适配主题
     st.markdown(
         f"""
         <div style="
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 1px solid #333;
+            background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--bg) 100%);
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 2rem;
             text-align: center;
             margin: 1rem 0 2rem;
         ">
-            <div style="font-size:0.9rem; color:#888; letter-spacing:2px;">TRADING SIGNAL</div>
+            <div style="font-size:0.9rem; color:var(--text-secondary); letter-spacing:2px;">TRADING SIGNAL</div>
             <div style="font-size:3.5rem; font-weight:900; color:{color}; margin:0.3rem 0;">
                 {signal.upper()}
             </div>
-            <div style="font-size:1.2rem; color:#f5f1eb;">
+            <div style="font-size:1.2rem; color:var(--text);">
                 {ticker_label} · {trade_date}
             </div>
             {stats_html}
@@ -98,72 +99,3 @@ def render_report(
             file_name=f"TradingAgents-Astock_{_safe_filename_label(ticker_label)}_{trade_date}.md",
             mime="text/markdown",
             use_container_width=True,
-        )
-    with col_pdf:
-        try:
-            pdf_bytes = generate_pdf(final_state, ticker, trade_date, signal)
-            st.download_button(
-                "📄 下载 PDF",
-                data=pdf_bytes,
-                file_name=f"TradingAgents-Astock_{_safe_filename_label(ticker_label)}_{trade_date}.pdf",
-                mime="application/pdf",
-                use_container_width=True,
-            )
-        except Exception as exc:  # noqa: BLE001 — never let PDF crash the page
-            st.button(
-                "📄 PDF 不可用",
-                disabled=True,
-                use_container_width=True,
-                help=f"PDF 生成失败，请改用 Markdown 导出。原因：{exc}",
-            )
-
-    st.markdown("---")
-
-    inv_plan = final_state.get("investment_plan", "")
-    if inv_plan:
-        st.markdown("### 👔 最终投资建议")
-        st.markdown(_display_report_text(inv_plan, ticker, final_state))
-        st.markdown("---")
-
-    st.markdown("### 📊 分析师报告")
-
-    for key, title in _ANALYST_SECTIONS:
-        content = final_state.get(key, "")
-        if not content:
-            continue
-        with st.expander(title, expanded=False):
-            st.markdown(_display_report_text(content, ticker, final_state))
-
-    debate = final_state.get("investment_debate_state")
-    if debate and isinstance(debate, dict):
-        st.markdown("### ⚔️ 多空辩论")
-        tab_bull, tab_bear, tab_judge = st.tabs(["多方", "空方", "研究经理"])
-        with tab_bull:
-            st.markdown(_display_report_text(debate.get("bull_history", "") or "无数据", ticker, final_state))
-        with tab_bear:
-            st.markdown(_display_report_text(debate.get("bear_history", "") or "无数据", ticker, final_state))
-        with tab_judge:
-            st.markdown(_display_report_text(debate.get("judge_decision", "") or "无数据", ticker, final_state))
-
-    trader_decision = final_state.get("trader_investment_decision", "")
-    if trader_decision:
-        with st.expander("💹 交易员决策", expanded=False):
-            st.markdown(_display_report_text(trader_decision, ticker, final_state))
-
-    risk = final_state.get("risk_debate_state")
-    if risk and isinstance(risk, dict):
-        st.markdown("### 🛡️ 风控评估")
-        tab_agg, tab_con, tab_neu, tab_rj = st.tabs(["激进", "保守", "中性", "风控决策"])
-        with tab_agg:
-            st.markdown(_display_report_text(risk.get("aggressive_history", "") or "无数据", ticker, final_state))
-        with tab_con:
-            st.markdown(_display_report_text(risk.get("conservative_history", "") or "无数据", ticker, final_state))
-        with tab_neu:
-            st.markdown(_display_report_text(risk.get("neutral_history", "") or "无数据", ticker, final_state))
-        with tab_rj:
-            st.markdown(_display_report_text(risk.get("judge_decision", "") or "无数据", ticker, final_state))
-
-    dqs = final_state.get("data_quality_summary", "")
-    if dqs:
-        with st.expander("✅ 数据质量", expanded=False):
-            st.markdown(_display_report_text(dqs, ticker, final_state))

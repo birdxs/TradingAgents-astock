@@ -200,20 +200,24 @@ def _render_theme_css() -> None:
             border-bottom-color: #ff5a1f !important;
         }}
         /* 暗黑主题下 tab 标签文字加强覆盖 - 使用白色确保可见 */
-        [data-baseweb="tab-list"] [data-baseweb="tab"],
-        [data-baseweb="tab-list"] [data-baseweb="tab"] > div,
-        [data-baseweb="tab-list"] [data-baseweb="tab"] span,
-        [data-baseweb="tab-list"] [data-baseweb="tab"] p,
-        [data-baseweb="tab-list"] [data-baseweb="tab"] button,
-        [data-baseweb="tab-list"] [data-baseweb="tab"] a {{
+        [data-baseweb="tab"]:not([aria-selected="true"]),
+        [data-baseweb="tab"]:not([aria-selected="true"]) > div,
+        [data-baseweb="tab"]:not([aria-selected="true"]) div,
+        [data-baseweb="tab"]:not([aria-selected="true"]) span,
+        [data-baseweb="tab"]:not([aria-selected="true"]) p,
+        [data-baseweb="tab"]:not([aria-selected="true"]) button,
+        [data-baseweb="tab"]:not([aria-selected="true"]) a,
+        [data-baseweb="tab"]:not([aria-selected="true"]) [data-baseweb="tab-text"] {{
             color: #ffffff !important;
         }}
-        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"],
-        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] > div,
-        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] span,
-        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] p,
-        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] button,
-        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] a {{
+        [data-baseweb="tab"][aria-selected="true"],
+        [data-baseweb="tab"][aria-selected="true"] > div,
+        [data-baseweb="tab"][aria-selected="true"] div,
+        [data-baseweb="tab"][aria-selected="true"] span,
+        [data-baseweb="tab"][aria-selected="true"] p,
+        [data-baseweb="tab"][aria-selected="true"] button,
+        [data-baseweb="tab"][aria-selected="true"] a,
+        [data-baseweb="tab"][aria-selected="true"] [data-baseweb="tab-text"] {{
             color: #ff5a1f !important;
         }}
         div[data-testid="stDownloadButton"] button {{

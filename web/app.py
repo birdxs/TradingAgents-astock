@@ -193,21 +193,27 @@ def _render_theme_css() -> None:
             color: var(--text) !important;
         }}
         .stTabs [data-baseweb="tab"] {{
-            color: var(--text) !important;
+            color: #ffffff !important;
         }}
         .stTabs [aria-selected="true"] {{
             color: #ff5a1f !important;
             border-bottom-color: #ff5a1f !important;
         }}
-        /* 暗黑主题下 tab 标签文字加强覆盖 */
-        [data-baseweb="tab"] > div,
-        [data-baseweb="tab"] span,
-        [data-baseweb="tab"] p {{
-            color: var(--text) !important;
+        /* 暗黑主题下 tab 标签文字加强覆盖 - 使用白色确保可见 */
+        [data-baseweb="tab-list"] [data-baseweb="tab"],
+        [data-baseweb="tab-list"] [data-baseweb="tab"] > div,
+        [data-baseweb="tab-list"] [data-baseweb="tab"] span,
+        [data-baseweb="tab-list"] [data-baseweb="tab"] p,
+        [data-baseweb="tab-list"] [data-baseweb="tab"] button,
+        [data-baseweb="tab-list"] [data-baseweb="tab"] a {{
+            color: #ffffff !important;
         }}
-        [data-baseweb="tab"][aria-selected="true"] > div,
-        [data-baseweb="tab"][aria-selected="true"] span,
-        [data-baseweb="tab"][aria-selected="true"] p {{
+        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"],
+        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] > div,
+        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] span,
+        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] p,
+        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] button,
+        [data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] a {{
             color: #ff5a1f !important;
         }}
         div[data-testid="stDownloadButton"] button {{

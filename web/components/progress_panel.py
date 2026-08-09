@@ -8,11 +8,12 @@ from web.progress import PIPELINE_STAGES, ProgressTracker
 
 
 def _status_badge(status: str) -> str:
+    """状态徽章使用固定颜色（不受主题影响）"""
     if status == "done":
         return '<span style="color:#22c55e; font-size:1.3rem;">●</span>'
     if status == "active":
         return '<span style="color:#ff5a1f; font-size:1.3rem;">◉</span>'
-    # 使用 CSS 变量适配主题
+    # 未开始状态使用 CSS 变量适配主题
     return '<span style="color:var(--text-secondary); font-size:1.3rem;">○</span>'
 
 

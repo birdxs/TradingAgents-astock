@@ -16,6 +16,7 @@ def _strip_think(text: str) -> str:
 
 
 def _signal_style(signal: str) -> tuple[str, str]:
+    """信号颜色使用固定品牌色（不受主题影响）"""
     s = signal.upper()
     if "BUY" in s:
         return "#22c55e", "买入"

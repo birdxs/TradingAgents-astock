@@ -38,7 +38,7 @@ st.set_page_config(
 
 # ── Theme configuration ───────────────────────────────────────────────────────
 
-# 主题配色方案
+# 主题配色方案（所有颜色使用 CSS 变量，避免硬编码）
 _THEMES = {
     "light": {
         "bg": "#ffffff",
@@ -53,6 +53,7 @@ _THEMES = {
         "button_secondary_hover": "#e8e8e8",
     },
     "dark": {
+        # 原项目暗黑主题配色（与原始项目一致）
         "bg": "#0a0a0a",
         "sidebar_bg": "#0f0f0f",
         "text": "#f5f1eb",
@@ -82,7 +83,7 @@ def _render_theme_css() -> None:
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
-        /* CSS 变量定义 */
+        /* CSS 变量定义（所有主题共用同一套变量名） */
         :root {{
             --bg: {theme['bg']};
             --sidebar-bg: {theme['sidebar_bg']};
@@ -211,7 +212,6 @@ def _render_theme_toggle() -> None:
     current_theme = st.session_state.get("theme", "light")
     is_dark = current_theme == "dark"
     
-    # 使用两列布局放置切换按钮
     col1, col2 = st.columns([1, 1])
     with col1:
         if st.button(
@@ -265,10 +265,6 @@ def _build_config() -> dict:
     # Leaving the fallback keys None makes the graph fall back to the
     # sidebar-selected llm_provider + models on quota/failure.
     scope = st.session_state.get("subscription_scope", "off")
-    # 侧栏那个输入框只配**深度节点**的模型。不要把它同时赋给 quick——
-    # quick 节点有 7 个分析师 + 多空/交易员/风险辩手，把深度节点的 opus 复制过去
-    # 会让订阅额度烧得极快，也与 README / 侧栏提示所说的「quick 默认 sonnet」矛盾。
-    # quick 的模型交给 DEFAULT_CONFIG（默认 sonnet），需要时在 config 层单独覆盖。
     sub_model = st.session_state.get("agent_sdk_model")
     if scope in ("deep", "all"):
         config["deep_think_provider_override"] = "claude_agent_sdk"
@@ -379,18 +375,18 @@ else:
                 font-weight: 900;
                 margin-bottom: 0.5rem;
             ">
-                <span style="color: #ff5a1f;">Trading</span><span style="color: {theme['text']};">Agents</span><span style="color: {theme['text']};">-</span><span style="color: #ff5a1f;">Astock</span>
+                <span style="color: #ff5a1f;">Trading</span><span style="color: var(--text);">Agents</span><span style="color: var(--text);">-</span><span style="color: #ff5a1f;">Astock</span>
             </div>
-            <div style="color: {theme['text_secondary']}; font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
+            <div style="color: var(--text-secondary); font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
                 A股多Agent投研分析系统<br>
                 7位AI分析师 → 质量门控 → 多空辩论 → 风控评估 → 最终决策
             </div>
             <div style="
                 margin-top: 2rem;
                 padding: 1rem 2rem;
-                border: 1px solid {theme['border']};
+                border: 1px solid var(--border);
                 border-radius: 12px;
-                color: {theme['text_secondary']};
+                color: var(--text-secondary);
                 font-size: 0.9rem;
             ">
                 ← 在左侧输入股票代码，开始分析
@@ -398,11 +394,11 @@ else:
             <div style="
                 margin-top: 2.5rem;
                 padding: 0.8rem 1.5rem;
-                color: {theme['text_secondary']};
+                color: var(--text-secondary);
                 font-size: 0.75rem;
                 max-width: 500px;
                 line-height: 1.6;
-                border-top: 1px solid {theme['border']};
+                border-top: 1px solid var(--border);
             ">
                 ⚠️ 本项目仅供学习研究与技术演示，不构成任何投资建议。<br>
                 投资决策请咨询持牌专业机构。作者不对使用本工具产生的任何损失承担责任。

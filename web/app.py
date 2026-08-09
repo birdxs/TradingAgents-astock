@@ -212,6 +212,18 @@ def _render_theme_css() -> None:
         div[data-testid="stCaption"] {{
             color: var(--text) !important;
         }}
+        /* 报告内容区域：所有 markdown 文字（包括无标签文本）继承 CSS 变量颜色 */
+        div[data-testid="stMarkdown"] {{
+            color: var(--text) !important;
+        }}
+        /* expander 内的 markdown 文字 */
+        div[data-testid="stExpander"] [data-testid="stMarkdown"] {{
+            color: var(--text) !important;
+        }}
+        /* tab 内的 markdown 文字 */
+        div[data-testid="stTabs"] [data-testid="stMarkdown"] {{
+            color: var(--text) !important;
+        }}
         /* 输入框内 placeholder 文字 */
         div[data-testid="stTextInputRootElement"] input::placeholder,
         div[data-testid="stDateInput"] input::placeholder {{

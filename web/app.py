@@ -174,11 +174,22 @@ def _render_theme_css() -> None:
             border-radius: 8px !important;
         }}
         .stTabs [data-baseweb="tab"] {{
-            color: var(--text-secondary) !important;
+            color: var(--text) !important;
         }}
         .stTabs [aria-selected="true"] {{
             color: #ff5a1f !important;
             border-bottom-color: #ff5a1f !important;
+        }}
+        /* 暗黑主题下 tab 标签文字加强覆盖 */
+        [data-baseweb="tab"] > div,
+        [data-baseweb="tab"] span,
+        [data-baseweb="tab"] p {{
+            color: var(--text) !important;
+        }}
+        [data-baseweb="tab"][aria-selected="true"] > div,
+        [data-baseweb="tab"][aria-selected="true"] span,
+        [data-baseweb="tab"][aria-selected="true"] p {{
+            color: #ff5a1f !important;
         }}
         div[data-testid="stDownloadButton"] button {{
             background: var(--sidebar-bg) !important;

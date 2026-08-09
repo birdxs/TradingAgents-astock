@@ -172,6 +172,25 @@ def _render_theme_css() -> None:
         .stExpander {{
             border: 1px solid var(--border) !important;
             border-radius: 8px !important;
+            background: var(--sidebar-bg) !important;
+        }}
+        .stExpander summary {{
+            background: var(--sidebar-bg) !important;
+            color: var(--text) !important;
+        }}
+        .stExpander summary:hover {{
+            background: var(--bg) !important;
+        }}
+        .stExpander [data-testid="stExpanderDetails"] {{
+            background: var(--bg) !important;
+        }}
+        .stExpander [data-testid="stExpanderDetails"] [data-testid="stMarkdown"] {{
+            color: var(--text) !important;
+        }}
+        .stExpander [data-testid="stExpanderDetails"] p,
+        .stExpander [data-testid="stExpanderDetails"] li,
+        .stExpander [data-testid="stExpanderDetails"] span {{
+            color: var(--text) !important;
         }}
         .stTabs [data-baseweb="tab"] {{
             color: var(--text) !important;

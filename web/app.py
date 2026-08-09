@@ -202,6 +202,44 @@ def _render_theme_css() -> None:
             border-color: var(--input-border) !important;
             color: var(--text) !important;
         }}
+        /* 暗黑主题覆盖：Streamlit 原生组件标签/标题使用 CSS 变量，确保暗黑主题下可见 */
+        div[data-testid="stWidgetLabel"] label,
+        div[data-testid="stMarkdown"] p,
+        div[data-testid="stMarkdown"] h1,
+        div[data-testid="stMarkdown"] h2,
+        div[data-testid="stMarkdown"] h3,
+        div[data-testid="stExpander"] summary,
+        div[data-testid="stCaption"] {{
+            color: var(--text) !important;
+        }}
+        /* 输入框内 placeholder 文字 */
+        div[data-testid="stTextInputRootElement"] input::placeholder,
+        div[data-testid="stDateInput"] input::placeholder {{
+            color: var(--text-secondary) !important;
+        }}
+        /* 下拉选择框标签和选中值 */
+        div[data-testid="stSelectbox"] label,
+        div[data-testid="stSelectbox"] [data-baseweb="select"] div {{
+            color: var(--text) !important;
+        }}
+        /* 按钮文字颜色（secondary 按钮） */
+        button[kind="secondary"] span {{
+            color: var(--text) !important;
+        }}
+        /* 复选框和单选按钮标签 */
+        div[data-testid="stCheckbox"] label,
+        div[data-testid="stRadio"] label {{
+            color: var(--text) !important;
+        }}
+        /* 侧栏内所有 Streamlit 组件文字 */
+        section[data-testid="stSidebar"] .stMarkdown,
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {{
+            color: var(--text) !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True,

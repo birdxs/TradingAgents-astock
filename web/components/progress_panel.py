@@ -7,12 +7,33 @@ import streamlit as st
 from web.progress import PIPELINE_STAGES, ProgressTracker
 
 
+def _get_theme_colors() -> dict:
+    """Get colors based on current theme."""
+    theme = st.session_state.get("theme", "dark")
+    if theme == "light":
+        return {
+            "text": "#333333",
+            "muted": "#666666",
+            "active": "#333333",
+            "pending": "#999999",
+            "done": "#22c55e",
+        }
+    return {
+        "text": "#f5f1eb",
+        "muted": "#888888",
+        "active": "#f5f1eb",
+        "pending": "#333333",
+        "done": "#22c55e",
+    }
+
+
 def _status_badge(status: str) -> str:
+    colors = _get_theme_colors()
     if status == "done":
-        return '<span style="color:#22c55e; font-size:1.3rem;">●</span>'
+        return f'<span style="color:{colors["done"]}; font-size:1.3rem;">●</span>'
     if status == "active":
         return '<span style="color:#ff5a1f; font-size:1.3rem;">◉</span>'
-    return '<span style="color:#333; font-size:1.3rem;">○</span>'
+    return f'<span style="color:{colors["pending"]}; font-size:1.3rem;">○</span>'
 
 
 def _format_time(seconds: float) -> str:
@@ -22,14 +43,15 @@ def _format_time(seconds: float) -> str:
 
 def render_progress(tracker: ProgressTracker) -> None:
     """Render the pipeline progress panel."""
+    colors = _get_theme_colors()
 
     st.markdown(
         f"""
         <div style="text-align:center; margin:1rem 0 0.5rem;">
-            <span style="font-size:1.6rem; font-weight:700; color:#f5f1eb;">
+            <span style="font-size:1.6rem; font-weight:700; color:{colors["text"]};">
                 分析进行中
             </span>
-            <span style="font-size:1.1rem; color:#888; margin-left:0.8rem;">
+            <span style="font-size:1.1rem; color:{colors["muted"]}; margin-left:0.8rem;">
                 {tracker.ticker}
             </span>
         </div>
@@ -53,7 +75,7 @@ def render_progress(tracker: ProgressTracker) -> None:
     post_stages = PIPELINE_STAGES[7:]
 
     st.markdown(
-        '<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:#888;">ANALYSTS</div>',
+        f'<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:{colors["muted"]};">ANALYSTS</div>',
         unsafe_allow_html=True,
     )
 
@@ -61,7 +83,7 @@ def render_progress(tracker: ProgressTracker) -> None:
     for col, stage in zip(cols, analyst_stages):
         status = tracker.stage_status(stage["id"])
         badge = _status_badge(status)
-        label_color = "#f5f1eb" if status == "active" else "#888" if status == "pending" else "#22c55e"
+        label_color = colors["active"] if status == "active" else colors["pending"] if status == "pending" else colors["done"]
         col.markdown(
             f"""
             <div style="text-align:center; padding:0.5rem 0;">
@@ -73,7 +95,7 @@ def render_progress(tracker: ProgressTracker) -> None:
         )
 
     st.markdown(
-        '<div style="margin:0.8rem 0 0.3rem; font-size:0.85rem; color:#888;">PIPELINE</div>',
+        f'<div style="margin:0.8rem 0 0.3rem; font-size:0.85rem; color:{colors["muted"]};">PIPELINE</div>',
         unsafe_allow_html=True,
     )
 
@@ -81,7 +103,7 @@ def render_progress(tracker: ProgressTracker) -> None:
     for col, stage in zip(cols2, post_stages):
         status = tracker.stage_status(stage["id"])
         badge = _status_badge(status)
-        label_color = "#f5f1eb" if status == "active" else "#888" if status == "pending" else "#22c55e"
+        label_color = colors["active"] if status == "active" else colors["pending"] if status == "pending" else colors["done"]
         col.markdown(
             f"""
             <div style="text-align:center; padding:0.5rem 0;">
@@ -111,7 +133,7 @@ def render_progress(tracker: ProgressTracker) -> None:
 
     if completed_reports:
         st.markdown(
-            '<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:#888;">'
+            f'<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:{colors["muted"]};">'
             f"REPORTS ({len(completed_reports)})</div>",
             unsafe_allow_html=True,
         )

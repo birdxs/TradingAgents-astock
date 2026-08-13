@@ -11,6 +11,24 @@ from web.pdf_export import generate_markdown, generate_pdf
 from web.stock_display import normalize_stock_mentions, stock_display_label
 
 
+def _get_theme_colors() -> dict:
+    """Get colors based on current theme."""
+    theme = st.session_state.get("theme", "dark")
+    if theme == "light":
+        return {
+            "card_bg": "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+            "card_border": "#dee2e6",
+            "text": "#333333",
+            "muted": "#666666",
+        }
+    return {
+        "card_bg": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+        "card_border": "#333333",
+        "text": "#f5f1eb",
+        "muted": "#888888",
+    }
+
+
 def _strip_think(text: str) -> str:
     return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
 
@@ -53,30 +71,30 @@ def render_report(
     elapsed: float | None = None,
 ) -> None:
     """Render the full analysis report."""
-
+    colors = _get_theme_colors()
     color, cn_signal = _signal_style(signal)
     ticker_label = stock_display_label(ticker, final_state)
 
     stats_html = ""
     if elapsed is not None:
         m, s = divmod(int(elapsed), 60)
-        stats_html = f'<div style="font-size:0.9rem; color:#888; margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
+        stats_html = f'<div style="font-size:0.9rem; color:{colors["muted"]}; margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
 
     st.markdown(
         f"""
         <div style="
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 1px solid #333;
+            background: {colors["card_bg"]};
+            border: 1px solid {colors["card_border"]};
             border-radius: 16px;
             padding: 2rem;
             text-align: center;
             margin: 1rem 0 2rem;
         ">
-            <div style="font-size:0.9rem; color:#888; letter-spacing:2px;">TRADING SIGNAL</div>
+            <div style="font-size:0.9rem; color:{colors["muted"]}; letter-spacing:2px;">TRADING SIGNAL</div>
             <div style="font-size:3.5rem; font-weight:900; color:{color}; margin:0.3rem 0;">
                 {signal.upper()}
             </div>
-            <div style="font-size:1.2rem; color:#f5f1eb;">
+            <div style="font-size:1.2rem; color:{colors["text"]};">
                 {ticker_label} · {trade_date}
             </div>
             {stats_html}

@@ -36,10 +36,142 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Custom CSS ───────────────────────────────────────────────────────────────
+# ── Theme Management ────────────────────────────────────────────────────────
 
-st.markdown(
+# Initialize theme in session state
+if "theme" not in st.session_state:
+    st.session_state["theme"] = "dark"
+
+
+def _get_light_css() -> str:
+    """Return CSS for light theme."""
+    return """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+    /* Hide Streamlit chrome */
+    #MainMenu,
+    footer,
+    div[data-testid="stDecoration"],
+    div[data-testid="stStatusWidget"],
+    div[data-testid="stToolbarActions"],
+    div[data-testid="stAppDeployButton"],
+    span[data-testid="stMainMenu"] { display: none !important; }
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    button[data-testid="stExpandSidebarButton"],
+    button[data-testid="stSidebarCollapseButton"],
+    button[data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapsedControl"] {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+    .stApp {
+        background: #ffffff !important;
+    }
+    section[data-testid="stSidebar"] {
+        background: #f8f9fa !important;
+        border-right: 1px solid #e0e0e0 !important;
+    }
+    .stMetric label { color: #666 !important; font-size: 0.8rem !important; }
+    .stMetric [data-testid="stMetricValue"] {
+        color: #ff5a1f !important;
+        font-weight: 700 !important;
+    }
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #ff5a1f, #ff8c42) !important;
+    }
+    button[kind="primary"] {
+        background: linear-gradient(135deg, #ff5a1f, #ff8c42) !important;
+        border: none !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.05em !important;
+        box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
+        transition: all 0.2s ease !important;
+    }
+    button[kind="primary"]:hover {
+        background: linear-gradient(135deg, #e04d15, #ff5a1f) !important;
+        box-shadow: 0 6px 20px rgba(255,90,31,0.4) !important;
+        transform: translateY(-1px) !important;
+    }
+    button[kind="secondary"] {
+        background: #ffffff !important;
+        border: 1px solid #d0d0d0 !important;
+        color: #333 !important;
+        transition: all 0.2s ease !important;
+    }
+    button[kind="secondary"]:hover {
+        background: #f5f5f5 !important;
+        border-color: #ff5a1f !important;
+        color: #ff5a1f !important;
+    }
+    .stExpander {
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+    }
+    .stTabs [data-baseweb="tab"] {
+        color: #666 !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #ff5a1f !important;
+        border-bottom-color: #ff5a1f !important;
+    }
+    div[data-testid="stDownloadButton"] button {
+        background: #ffffff !important;
+        border: 1px solid #ff5a1f !important;
+        color: #ff5a1f !important;
+    }
+    input[data-testid="stTextInputRootElement"] input,
+    .stTextInput input {
+        background: #ffffff !important;
+        border-color: #d0d0d0 !important;
+        color: #333333 !important;
+    }
+    .stTextInput input:focus {
+        border-color: #ff5a1f !important;
+        box-shadow: 0 0 0 1px #ff5a1f !important;
+    }
+    .stDateInput input {
+        background: #ffffff !important;
+        border-color: #d0d0d0 !important;
+        color: #333333 !important;
+    }
+    /* Theme toggle button styling */
+    #theme-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 999999;
+        background: #f8f9fa;
+        border: 2px solid #ff5a1f;
+        color: #333333;
+        padding: 10px 18px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(255,90,31,0.3);
+        transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif;
+    }
+    #theme-toggle-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 6px 25px rgba(255,90,31,0.5);
+    }
+    </style>
     """
+
+
+def _get_dark_css() -> str:
+    """Return CSS for dark theme."""
+    return """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
@@ -76,11 +208,11 @@ st.markdown(
         font-family: 'Inter', -apple-system, sans-serif;
     }
     .stApp {
-        background: #0a0a0a;
+        background: #0a0a0a !important;
     }
     section[data-testid="stSidebar"] {
-        background: #0f0f0f;
-        border-right: 1px solid #1a1a1a;
+        background: #0f0f0f !important;
+        border-right: 1px solid #1a1a1a !important;
     }
     .stMetric label { color: #888 !important; font-size: 0.8rem !important; }
     .stMetric [data-testid="stMetricValue"] {
@@ -148,10 +280,37 @@ st.markdown(
         border-color: #2a2a2a !important;
         color: #f5f1eb !important;
     }
+    /* Theme toggle button styling */
+    #theme-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 999999;
+        background: #0f0f0f;
+        border: 2px solid #ff5a1f;
+        color: #f5f1eb;
+        padding: 10px 18px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(255,90,31,0.3);
+        transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif;
+    }
+    #theme-toggle-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 6px 25px rgba(255,90,31,0.5);
+    }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+    """
+
+
+# Apply theme CSS based on current theme
+if st.session_state["theme"] == "light":
+    st.markdown(_get_light_css(), unsafe_allow_html=True)
+else:
+    st.markdown(_get_dark_css(), unsafe_allow_html=True)
 
 
 # ── Build config ─────────────────────────────────────────────────────────────
@@ -276,8 +435,15 @@ elif tracker and tracker.error:
 
 # State 0: Idle — welcome screen
 else:
+    # Dynamic colors based on theme
+    theme = st.session_state["theme"]
+    text_color = "#333333" if theme == "light" else "#f5f1eb"
+    muted_color = "#666666" if theme == "light" else "#888888"
+    border_color = "#e0e0e0" if theme == "light" else "#222222"
+    top_border_color = "#e0e0e0" if theme == "light" else "#1a1a1a"
+    
     st.markdown(
-        """
+        f"""
         <div style="
             display: flex;
             flex-direction: column;
@@ -292,18 +458,18 @@ else:
                 font-weight: 900;
                 margin-bottom: 0.5rem;
             ">
-                <span style="color: #ff5a1f;">Trading</span><span style="color: #f5f1eb;">Agents</span><span style="color: #f5f1eb;">-</span><span style="color: #ff5a1f;">Astock</span>
+                <span style="color: #ff5a1f;">Trading</span><span style="color: {text_color};">Agents</span><span style="color: {text_color};">-</span><span style="color: #ff5a1f;">Astock</span>
             </div>
-            <div style="color: #888; font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
+            <div style="color: {muted_color}; font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
                 A股多Agent投研分析系统<br>
                 7位AI分析师 → 质量门控 → 多空辩论 → 风控评估 → 最终决策
             </div>
             <div style="
                 margin-top: 2rem;
                 padding: 1rem 2rem;
-                border: 1px solid #222;
+                border: 1px solid {border_color};
                 border-radius: 12px;
-                color: #666;
+                color: {muted_color};
                 font-size: 0.9rem;
             ">
                 ← 在左侧输入股票代码，开始分析
@@ -311,11 +477,11 @@ else:
             <div style="
                 margin-top: 2.5rem;
                 padding: 0.8rem 1.5rem;
-                color: #555;
+                color: {muted_color};
                 font-size: 0.75rem;
                 max-width: 500px;
                 line-height: 1.6;
-                border-top: 1px solid #1a1a1a;
+                border-top: 1px solid {top_border_color};
             ">
                 ⚠️ 本项目仅供学习研究与技术演示，不构成任何投资建议。<br>
                 投资决策请咨询持牌专业机构。作者不对使用本工具产生的任何损失承担责任。
@@ -324,3 +490,56 @@ else:
         """,
         unsafe_allow_html=True,
     )
+
+
+# ── Theme Toggle Button (Bottom-Left Corner) ────────────────────────────────
+
+theme = st.session_state["theme"]
+if theme == "dark":
+    toggle_label = "🌙 暗黑模式"
+else:
+    toggle_label = "☀️ 明亮模式"
+
+# Create a hidden container for the theme toggle
+st.markdown(
+    """
+    <style>
+    section[data-testid="stBlock"][data-stale="false"] {
+        position: relative;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Use a small column at the bottom for the toggle
+col1, col2, col3 = st.columns([1, 2, 1])
+with col1:
+    if st.button(toggle_label, key="theme_toggle_button", use_container_width=True):
+        st.session_state["theme"] = "light" if theme == "dark" else "dark"
+        st.rerun()
+
+# Add CSS to position the button at bottom-left
+st.markdown(
+    """
+    <style>
+    div[data-testid="stHorizontalBlock"]:last-of-type {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 999999;
+        width: auto !important;
+        max-width: 200px;
+    }
+    div[data-testid="stHorizontalBlock"]:last-of-type > div {
+        min-width: auto !important;
+        width: auto !important;
+    }
+    div[data-testid="stHorizontalBlock"]:last-of-type > div:nth-child(2),
+    div[data-testid="stHorizontalBlock"]:last-of-type > div:nth-child(3) {
+        display: none !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)

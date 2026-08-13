@@ -36,6 +36,22 @@ _PROVIDER_DISPLAY = [name for name, _ in _PROVIDERS]
 _PROVIDER_KEYS = [key for _, key in _PROVIDERS]
 
 
+def _get_theme_colors() -> dict:
+    """Get colors based on current theme."""
+    theme = st.session_state.get("theme", "dark")
+    if theme == "light":
+        return {
+            "text": "#333333",
+            "muted": "#666666",
+            "link": "#ff5a1f",
+        }
+    return {
+        "text": "#f5f1eb",
+        "muted": "#888888",
+        "link": "#ff5a1f",
+    }
+
+
 def _resolve_user_input(raw: str) -> tuple[str, str | None]:
     """Resolve raw user input to (ticker_code, error_msg).
 
@@ -246,16 +262,17 @@ def _render_llm_config() -> None:
 
 def render_sidebar() -> None:
     """Render the sidebar with input controls and history."""
+    colors = _get_theme_colors()
 
     st.markdown(
-        """
+        f"""
         <div style="text-align:center; margin-bottom:1.5rem;">
-            <span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Trading</span><span style="font-size:2rem; font-weight:800; color:#f5f1eb;">Agents</span><span style="font-size:2rem; font-weight:800; color:#f5f1eb;">-</span><span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Astock</span>
-            <div style="font-size:0.85rem; color:#888; margin-top:0.2rem;">
+            <span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Trading</span><span style="font-size:2rem; font-weight:800; color:{colors["text"]};">Agents</span><span style="font-size:2rem; font-weight:800; color:{colors["text"]};">-</span><span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Astock</span>
+            <div style="font-size:0.85rem; color:{colors["muted"]}; margin-top:0.2rem;">
                 A股多Agent投研系统
             </div>
             <div style="font-size:0.7rem; color:#555; margin-top:0.3rem;">
-                by <a href="https://github.com/simonlin1212" style="color:#ff5a1f; text-decoration:none;">simonlin1212</a>
+                by <a href="https://github.com/simonlin1212" style="color:{colors["link"]}; text-decoration:none;">simonlin1212</a>
             </div>
         </div>
         """,

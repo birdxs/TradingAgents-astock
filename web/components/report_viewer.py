@@ -21,6 +21,9 @@ def _get_theme_colors() -> dict:
             "text": "#1a1a2e",
             "muted": "#5a5a6e",
             "shadow": "rgba(0,0,0,0.08)",
+            "expander_bg": "#ffffff",
+            "expander_hover": "#f5f5f8",
+            "expander_text": "#1a1a2e",
         }
     return {
         "card_bg": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
@@ -28,6 +31,9 @@ def _get_theme_colors() -> dict:
         "text": "#f5f1eb",
         "muted": "#888888",
         "shadow": "rgba(0,0,0,0.3)",
+        "expander_bg": "#0f0f0f",
+        "expander_hover": "#1a1a1a",
+        "expander_text": "#f5f1eb",
     }
 
 
@@ -82,8 +88,8 @@ def render_report(
         m, s = divmod(int(elapsed), 60)
         stats_html = f'<div style="font-size:0.9rem; color:{colors["muted"]}; margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
 
-    # 根据主题选择背景样式
-    if st.session_state.get("theme", "dark") == "light":
+    theme = st.session_state.get("theme", "dark")
+    if theme == "light":
         bg_style = f"background: {colors['card_bg']};"
     else:
         bg_style = f"background: {colors['card_bg']};"
@@ -114,8 +120,7 @@ def render_report(
 
     st.caption("⚠️ 本报告由 AI 自动生成，仅供学习研究，不构成投资建议。")
 
-    # Markdown export always works (no font dependency); PDF is generated
-    # lazily and guarded so a PDF/font failure never crashes the results page.
+    # Download buttons
     col_md, col_pdf, col_spacer = st.columns([1, 1, 2])
     with col_md:
         md_text = generate_markdown(final_state, ticker, trade_date, signal)
@@ -136,7 +141,7 @@ def render_report(
                 mime="application/pdf",
                 use_container_width=True,
             )
-        except Exception as exc:  # noqa: BLE001 — never let PDF crash the page
+        except Exception as exc:
             st.button(
                 "📄 PDF 不可用",
                 disabled=True,

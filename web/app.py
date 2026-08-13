@@ -14,12 +14,9 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-# override=True：让 .env 的值优先于进程里可能残留的空/旧环境变量（#66）。
-# 注意：load_dotenv 仅在进程启动时执行一次，启动后修改 .env 仍需重启 Web 服务才生效。
 load_dotenv(_PROJECT_ROOT / ".env", override=True)
 
 from tradingagents.default_config import DEFAULT_CONFIG  # noqa: E402
-
 from web.components.progress_panel import render_progress  # noqa: E402
 from web.components.report_viewer import render_report  # noqa: E402
 from web.components.sidebar import render_sidebar  # noqa: E402
@@ -38,7 +35,6 @@ st.set_page_config(
 
 # ── Theme Management ────────────────────────────────────────────────────────
 
-# Initialize theme in session state
 if "theme" not in st.session_state:
     st.session_state["theme"] = "dark"
 
@@ -55,26 +51,19 @@ def _get_light_css() -> str:
         display: none !important; 
     }
     header[data-testid="stHeader"] {
-        background: transparent !important;
-        box-shadow: none !important;
+        background: transparent !important; box-shadow: none !important;
     }
     button[data-testid="stExpandSidebarButton"],
     button[data-testid="stSidebarCollapseButton"],
     button[data-testid="collapsedControl"],
     [data-testid="stSidebarCollapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+        display: flex !important; visibility: visible !important; opacity: 1 !important;
     }
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, sans-serif;
-    }
-    
+    html, body, [class*="css"] { font-family: 'Inter', -apple-system, sans-serif; }
     .stApp { background: #f0f2f5 !important; }
     section[data-testid="stSidebar"] {
-        background: #ffffff !important;
-        border-right: 1px solid #d9d9d9 !important;
+        background: #ffffff !important; border-right: 1px solid #d9d9d9 !important;
     }
     
     .stMarkdown, p, span, label, .stText { color: #1a1a2e !important; }
@@ -92,7 +81,6 @@ def _get_light_css() -> str:
         border: none !important; color: #ffffff !important;
         font-weight: 700 !important; letter-spacing: 0.03em !important;
         box-shadow: 0 2px 8px rgba(224,90,0,0.25) !important;
-        transition: all 0.2s ease !important;
     }
     button[kind="primary"]:hover {
         background: linear-gradient(135deg, #c54d00, #e05a00) !important;
@@ -102,19 +90,35 @@ def _get_light_css() -> str:
     
     button[kind="secondary"] {
         background: #ffffff !important; border: 1px solid #d0d0d8 !important;
-        color: #3a3a4a !important; transition: all 0.2s ease !important;
+        color: #3a3a4a !important;
     }
     button[kind="secondary"]:hover {
         background: #f5f5f8 !important; border-color: #e05a00 !important;
         color: #e05a00 !important;
     }
     
+    /* Expander styling */
     .stExpander {
         border: 1px solid #d9d9d9 !important; border-radius: 8px !important;
         background: #ffffff !important;
     }
     .stExpander [data-testid="stExpanderDetails"] {
         background: #fafafa !important; border-top: 1px solid #e8e8e8 !important;
+    }
+    /* Expander header - fix hover and default state */
+    .stExpander > div > div:first-child {
+        background: #ffffff !important;
+        color: #1a1a2e !important;
+    }
+    .stExpander > div > div:first-child:hover {
+        background: #f5f5f8 !important;
+        color: #1a1a2e !important;
+    }
+    .stExpander > div > div:first-child span {
+        color: #1a1a2e !important;
+    }
+    .stExpander > div > div:first-child:hover span {
+        color: #1a1a2e !important;
     }
     
     .stTabs [data-baseweb="tab"] { color: #5a5a6e !important; background: transparent !important; }
@@ -129,6 +133,7 @@ def _get_light_css() -> str:
         border-top: none !important; padding: 1rem !important;
     }
     
+    /* Download button */
     div[data-testid="stDownloadButton"] button {
         background: #ffffff !important; border: 1px solid #e05a00 !important;
         color: #e05a00 !important; font-weight: 600 !important;
@@ -138,6 +143,7 @@ def _get_light_css() -> str:
         color: #c54d00 !important;
     }
     
+    /* Text input */
     input[data-testid="stTextInputRootElement"] input, .stTextInput input {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
@@ -148,23 +154,31 @@ def _get_light_css() -> str:
     }
     .stTextInput label { color: #3a3a4a !important; }
     
+    /* Date input */
     .stDateInput input {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
     .stDateInput label { color: #3a3a4a !important; }
     
+    /* Selectbox - fix dropdown */
     .stSelectbox > div > div {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
     .stSelectbox label { color: #3a3a4a !important; }
+    /* Dropdown menu options */
     div[data-baseweb="popover"] > div, div[data-baseweb="menu"] {
         background: #ffffff !important; border: 1px solid #d0d0d8 !important;
     }
     div[data-baseweb="option"]:hover { background: #f5f0eb !important; }
     div[data-baseweb="option"] span { color: #1a1a2e !important; }
+    /* Selectbox dropdown items */
+    ul[role="listbox"] { background: #ffffff !important; }
+    ul[role="listbox"] li { color: #1a1a2e !important; }
+    ul[role="listbox"] li:hover { background: #f5f0eb !important; }
     
+    /* Text area */
     .stTextArea textarea {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
@@ -202,37 +216,28 @@ def _get_light_css() -> str:
         border-radius: 8px !important; padding: 0.8rem !important;
     }
     
-    /* Theme toggle button - fixed bottom right */
-    div[data-testid="theme-toggle-container"] {
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 999999 !important;
-    }
-    div[data-testid="theme-toggle-container"] button {
+    /* Theme toggle button in sidebar */
+    button[data-testid="theme-toggle-btn"] {
         background: #ffffff !important;
-        border: 2px solid #e05a00 !important;
-        color: #e05a00 !important;
-        padding: 10px 20px !important;
-        border-radius: 25px !important;
-        font-size: 14px !important;
-        font-weight: 600 !important;
+        border: 1px solid #d0d0d8 !important;
+        color: #1a1a2e !important;
+        width: 100% !important;
+        padding: 8px !important;
+        border-radius: 8px !important;
+        font-size: 1.2rem !important;
         cursor: pointer !important;
-        box-shadow: 0 4px 15px rgba(224,90,0,0.2) !important;
         transition: all 0.2s ease !important;
-        font-family: 'Inter', sans-serif !important;
     }
-    div[data-testid="theme-toggle-container"] button:hover {
-        transform: scale(1.05) !important;
-        box-shadow: 0 6px 20px rgba(224,90,0,0.35) !important;
-        background: #fff5eb !important;
+    button[data-testid="theme-toggle-btn"]:hover {
+        background: #f5f5f8 !important;
+        border-color: #e05a00 !important;
     }
     </style>
     """
 
 
 def _get_dark_css() -> str:
-    """Return CSS for dark theme - 保持原有配色"""
+    """Return CSS for dark theme"""
     return """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
@@ -269,7 +274,6 @@ def _get_dark_css() -> str:
         border: none !important; font-weight: 700 !important;
         letter-spacing: 0.05em !important;
         box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
-        transition: all 0.2s ease !important;
     }
     button[kind="primary"]:hover {
         background: linear-gradient(135deg, #e04d15, #ff5a1f) !important;
@@ -278,7 +282,7 @@ def _get_dark_css() -> str:
     }
     button[kind="secondary"] {
         background: #161616 !important; border: 1px solid #2a2a2a !important;
-        color: #ccc !important; transition: all 0.2s ease !important;
+        color: #ccc !important;
     }
     button[kind="secondary"]:hover {
         background: #1e1e1e !important; border-color: #ff5a1f !important;
@@ -305,29 +309,21 @@ def _get_dark_css() -> str:
         color: #f5f1eb !important;
     }
     
-    /* Theme toggle button - fixed bottom right */
-    div[data-testid="theme-toggle-container"] {
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 999999 !important;
-    }
-    div[data-testid="theme-toggle-container"] button {
-        background: #0f0f0f !important;
-        border: 2px solid #ff5a1f !important;
+    /* Theme toggle button in sidebar */
+    button[data-testid="theme-toggle-btn"] {
+        background: #161616 !important;
+        border: 1px solid #2a2a2a !important;
         color: #f5f1eb !important;
-        padding: 10px 20px !important;
-        border-radius: 25px !important;
-        font-size: 14px !important;
-        font-weight: 600 !important;
+        width: 100% !important;
+        padding: 8px !important;
+        border-radius: 8px !important;
+        font-size: 1.2rem !important;
         cursor: pointer !important;
-        box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
         transition: all 0.2s ease !important;
-        font-family: 'Inter', sans-serif !important;
     }
-    div[data-testid="theme-toggle-container"] button:hover {
-        transform: scale(1.05) !important;
-        box-shadow: 0 6px 25px rgba(255,90,31,0.5) !important;
+    button[data-testid="theme-toggle-btn"]:hover {
+        background: #1e1e1e !important;
+        border-color: #ff5a1f !important;
     }
     </style>
     """
@@ -376,6 +372,13 @@ def _build_config() -> dict:
 
 with st.sidebar:
     render_sidebar()
+    # Theme toggle button in sidebar
+    theme = st.session_state["theme"]
+    toggle_icon = "☀️" if theme == "dark" else "🌙"
+    if st.button(toggle_icon, key="theme_toggle", use_container_width=True,
+                 help="切换到明亮模式" if theme == "dark" else "切换到暗黑模式"):
+        st.session_state["theme"] = "light" if theme == "dark" else "dark"
+        st.rerun()
 
 
 # ── Handle "Start Analysis" trigger ──────────────────────────────────────────
@@ -411,7 +414,6 @@ if start_req:
 tracker: ProgressTracker | None = st.session_state.get("tracker")
 viewing_history: str | None = st.session_state.get("viewing_history")
 
-# State 1: Viewing a historical analysis
 if viewing_history:
     try:
         state = load_analysis(viewing_history)
@@ -422,13 +424,11 @@ if viewing_history:
     except Exception as exc:
         st.error(f"加载失败: {exc}")
 
-# State 2: Analysis running
 elif tracker and tracker.is_running:
     render_progress(tracker)
     time.sleep(2)
     st.rerun()
 
-# State 3: Analysis complete
 elif tracker and tracker.is_complete:
     render_report(
         tracker.final_state,
@@ -438,7 +438,6 @@ elif tracker and tracker.is_complete:
         elapsed=tracker.elapsed,
     )
 
-# State 4: Analysis errored
 elif tracker and tracker.error:
     st.error(f"分析失败: {tracker.error}")
     st.caption("已完成阶段会保存在本地断点中；修复模型额度或配置后，可以继续未完成的部分。")
@@ -450,7 +449,6 @@ elif tracker and tracker.error:
         st.session_state["viewing_history"] = None
         st.rerun()
 
-# State 0: Idle — welcome screen
 else:
     theme = st.session_state["theme"]
     if theme == "light":
@@ -497,23 +495,3 @@ else:
         """,
         unsafe_allow_html=True,
     )
-
-
-# ── Theme Toggle Button (Fixed Bottom-Right) ────────────────────────────────
-
-# Create a container for the theme toggle button at the end of the page
-st.markdown("<div style='height: 80px;'></div>", unsafe_allow_html=True)
-
-# Use st.container with a specific testid for the toggle
-with st.container():
-    st.markdown('<div data-testid="theme-toggle-container">', unsafe_allow_html=True)
-    theme = st.session_state["theme"]
-    if theme == "dark":
-        toggle_label = "🌙 暗黑模式"
-    else:
-        toggle_label = "☀️ 明亮模式"
-    
-    if st.button(toggle_label, key="theme_toggle"):
-        st.session_state["theme"] = "light" if theme == "dark" else "dark"
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)

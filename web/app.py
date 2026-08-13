@@ -33,10 +33,15 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Theme Management ────────────────────────────────────────────────────────
+# ── Theme Management（支持 URL 持久化）────────────────────────────────────
 
-if "theme" not in st.session_state:
-    st.session_state["theme"] = "dark"
+_initial_theme = st.session_state.get("theme")
+if _initial_theme is None:
+    # 首次加载：从 URL 参数恢复主题（刷新页面不丢失）
+    saved = st.query_params.get("theme", "dark")
+    if isinstance(saved, list):
+        saved = saved[0] if saved else "dark"
+    st.session_state["theme"] = saved if saved in ("light", "dark") else "dark"
 
 
 def _get_light_css() -> str:
@@ -65,29 +70,27 @@ def _get_light_css() -> str:
     section[data-testid="stSidebar"] {
         background: #ffffff !important; border-right: 1px solid #d9d9d9 !important;
     }
-    
+
+    /* 主文本 */
     .stMarkdown, p, span, label, .stText { color: #1a1a2e !important; }
     .stMetric label { color: #5a5a6e !important; font-size: 0.8rem !important; }
     .stMetric [data-testid="stMetricValue"] {
         color: #e05a00 !important; font-weight: 700 !important;
     }
-    
     .stProgress > div > div > div {
         background: linear-gradient(90deg, #e05a00, #ff7a33) !important;
     }
-    
+
+    /* 按钮 */
     button[kind="primary"] {
         background: linear-gradient(135deg, #e05a00, #ff7a33) !important;
         border: none !important; color: #ffffff !important;
-        font-weight: 700 !important; letter-spacing: 0.03em !important;
+        font-weight: 700 !important;
         box-shadow: 0 2px 8px rgba(224,90,0,0.25) !important;
     }
     button[kind="primary"]:hover {
         background: linear-gradient(135deg, #c54d00, #e05a00) !important;
-        box-shadow: 0 4px 12px rgba(224,90,0,0.35) !important;
-        transform: translateY(-1px) !important;
     }
-    
     button[kind="secondary"] {
         background: #ffffff !important; border: 1px solid #d0d0d8 !important;
         color: #3a3a4a !important;
@@ -96,31 +99,45 @@ def _get_light_css() -> str:
         background: #f5f5f8 !important; border-color: #e05a00 !important;
         color: #e05a00 !important;
     }
-    
-    /* Expander styling */
-    .stExpander {
-        border: 1px solid #d9d9d9 !important; border-radius: 8px !important;
+
+    /* === Expander：所有状态（含展开后 hover 移开）都保持浅色 === */
+    div[data-testid="stExpander"] {
+        border: 1px solid #d9d9d9 !important;
+        border-radius: 8px !important;
         background: #ffffff !important;
     }
-    .stExpander [data-testid="stExpanderDetails"] {
-        background: #fafafa !important; border-top: 1px solid #e8e8e8 !important;
-    }
-    /* Expander header - fix hover and default state */
-    .stExpander > div > div:first-child {
+    /* 头部（role=button），涵盖折叠/展开/悬停全部状态 */
+    div[data-testid="stExpander"] div[role="button"] {
         background: #ffffff !important;
         color: #1a1a2e !important;
     }
-    .stExpander > div > div:first-child:hover {
+    div[data-testid="stExpander"] div[role="button"]:hover {
         background: #f5f5f8 !important;
         color: #1a1a2e !important;
     }
-    .stExpander > div > div:first-child span {
+    div[data-testid="stExpander"] div[role="button"] span,
+    div[data-testid="stExpander"] div[role="button"] div,
+    div[data-testid="stExpander"] div[role="button"] p {
         color: #1a1a2e !important;
     }
-    .stExpander > div > div:first-child:hover span {
+    div[data-testid="stExpander"] div[role="button"]:hover span,
+    div[data-testid="stExpander"] div[role="button"]:hover div,
+    div[data-testid="stExpander"] div[role="button"]:hover p {
         color: #1a1a2e !important;
     }
-    
+    /* 展开后的内容区 */
+    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
+        background: #fafafa !important;
+        color: #1a1a2e !important;
+        border-top: 1px solid #e8e8e8 !important;
+    }
+    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] p,
+    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] span,
+    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] label {
+        color: #1a1a2e !important;
+    }
+
+    /* Tab 标签 */
     .stTabs [data-baseweb="tab"] { color: #5a5a6e !important; background: transparent !important; }
     .stTabs [aria-selected="true"] {
         color: #e05a00 !important; border-bottom-color: #e05a00 !important;
@@ -132,8 +149,8 @@ def _get_light_css() -> str:
         background: #ffffff !important; border: 1px solid #e8e8e8 !important;
         border-top: none !important; padding: 1rem !important;
     }
-    
-    /* Download button */
+
+    /* 下载按钮 */
     div[data-testid="stDownloadButton"] button {
         background: #ffffff !important; border: 1px solid #e05a00 !important;
         color: #e05a00 !important; font-weight: 600 !important;
@@ -142,8 +159,8 @@ def _get_light_css() -> str:
         background: #fff5eb !important; border-color: #c54d00 !important;
         color: #c54d00 !important;
     }
-    
-    /* Text input */
+
+    /* 文本输入 */
     input[data-testid="stTextInputRootElement"] input, .stTextInput input {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
@@ -153,40 +170,106 @@ def _get_light_css() -> str:
         box-shadow: 0 0 0 2px rgba(224,90,0,0.15) !important;
     }
     .stTextInput label { color: #3a3a4a !important; }
-    
-    /* Date input */
+
+    /* 日期输入 */
     .stDateInput input {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
     .stDateInput label { color: #3a3a4a !important; }
-    
-    /* Selectbox - fix dropdown */
+
+    /* === 日历弹出层（Baseweb Datepicker）=== */
+    /* 弹出层容器 */
+    [data-baseweb="popover"] div[data-baseweb="calendar"] {
+        background: #ffffff !important;
+        border: 1px solid #d0d0d8 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+    }
+    /* 日历内所有元素基础色 */
+    [data-baseweb="calendar"] {
+        background: #ffffff !important;
+        color: #1a1a2e !important;
+    }
+    [data-baseweb="calendar"] * { color: #1a1a2e !important; }
+    /* 头部月份/年份 */
+    [data-baseweb="calendar-header"],
+    [data-baseweb="calendar"] [data-baseweb="calendar-header"] {
+        background: #ffffff !important;
+        color: #1a1a2e !important;
+    }
+    [data-baseweb="calendar"] button {
+        background: transparent !important;
+        color: #1a1a2e !important;
+    }
+    [data-baseweb="calendar"] button:hover {
+        background: #f5f5f8 !important;
+        color: #1a1a2e !important;
+    }
+    /* 星期表头 */
+    [data-baseweb="calendar"] [role="columnheader"] {
+        background: #ffffff !important;
+        color: #5a5a6e !important;
+    }
+    /* 日期格子 */
+    [data-baseweb="day"] {
+        background: #ffffff !important;
+        color: #1a1a2e !important;
+    }
+    [data-baseweb="day"]:hover {
+        background: #f5f0eb !important;
+        color: #1a1a2e !important;
+    }
+    /* 选中日期 */
+    [data-baseweb="day"][aria-selected="true"] {
+        background: #e05a00 !important;
+        color: #ffffff !important;
+    }
+    /* 高亮日期 */
+    [data-baseweb="day-highlighted"] {
+        background: #f5f0eb !important;
+        color: #1a1a2e !important;
+    }
+    /* 禁用日期 */
+    [data-baseweb="day-disabled"] {
+        background: #f5f5f8 !important;
+        color: #b0b0b8 !important;
+    }
+    /* 今天标记 */
+    [data-baseweb="calendar"] [data-baseweb="day"][aria-label*="today"],
+    [data-baseweb="calendar"] [aria-current="date"] {
+        background: #fff5eb !important;
+        color: #e05a00 !important;
+    }
+    [data-baseweb="calendar"] [aria-current="date"] {
+        background: #fff5eb !important;
+        color: #e05a00 !important;
+    }
+
+    /* Selectbox 下拉 */
     .stSelectbox > div > div {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
     .stSelectbox label { color: #3a3a4a !important; }
-    /* Dropdown menu options */
-    div[data-baseweb="popover"] > div, div[data-baseweb="menu"] {
+    div[data-baseweb="popover"] > div, div[data-baseweb="menu"],
+    ul[role="listbox"] {
         background: #ffffff !important; border: 1px solid #d0d0d8 !important;
     }
-    div[data-baseweb="option"]:hover { background: #f5f0eb !important; }
-    div[data-baseweb="option"] span { color: #1a1a2e !important; }
-    /* Selectbox dropdown items */
-    ul[role="listbox"] { background: #ffffff !important; }
-    ul[role="listbox"] li { color: #1a1a2e !important; }
-    ul[role="listbox"] li:hover { background: #f5f0eb !important; }
-    
-    /* Text area */
+    ul[role="listbox"] li, div[data-baseweb="option"] span { color: #1a1a2e !important; }
+    ul[role="listbox"] li:hover, div[data-baseweb="option"]:hover {
+        background: #f5f0eb !important;
+    }
+
+    /* 文本区域 */
     .stTextArea textarea {
         background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
-    
+
     .stCheckbox label, .stRadio label { color: #3a3a4a !important; }
     hr { border-color: #e8e8e8 !important; }
-    
+
     div[data-testid="stAlert"] {
         background: #f0f7ff !important; border-color: #b3d4fc !important; color: #1a4a7a !important;
     }
@@ -199,24 +282,25 @@ def _get_light_css() -> str:
     div[data-testid="stWarning"] {
         background: #fffbeb !important; border-color: #fbd38d !important; color: #744210 !important;
     }
-    
+
     code {
         background: #f5f5f8 !important; color: #e05a00 !important;
         border: 1px solid #e8e8e8 !important;
     }
     pre { background: #f8f8fa !important; border: 1px solid #e8e8e8 !important; }
-    
+
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #f0f2f5 !important; }
     ::-webkit-scrollbar-thumb { background: #c0c0c8 !important; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #a0a0a8 !important; }
-    
+
+    /* 指标卡片 */
     div[data-testid="stMetric"] {
         background: #ffffff !important; border: 1px solid #e8e8e8 !important;
         border-radius: 8px !important; padding: 0.8rem !important;
     }
-    
-    /* Theme toggle button in sidebar */
+
+    /* 侧边栏主题切换按钮 */
     button[data-testid="theme-toggle-btn"] {
         background: #ffffff !important;
         border: 1px solid #d0d0d8 !important;
@@ -308,8 +392,8 @@ def _get_dark_css() -> str:
         background: #161616 !important; border-color: #2a2a2a !important;
         color: #f5f1eb !important;
     }
-    
-    /* Theme toggle button in sidebar */
+
+    /* 侧边栏主题切换按钮 */
     button[data-testid="theme-toggle-btn"] {
         background: #161616 !important;
         border: 1px solid #2a2a2a !important;
@@ -372,12 +456,15 @@ def _build_config() -> dict:
 
 with st.sidebar:
     render_sidebar()
-    # Theme toggle button in sidebar
+    # 主题切换按钮（仅图标，位于侧边栏底部）
     theme = st.session_state["theme"]
     toggle_icon = "☀️" if theme == "dark" else "🌙"
-    if st.button(toggle_icon, key="theme_toggle", use_container_width=True,
-                 help="切换到明亮模式" if theme == "dark" else "切换到暗黑模式"):
-        st.session_state["theme"] = "light" if theme == "dark" else "dark"
+    toggle_help = "切换到明亮模式" if theme == "dark" else "切换到暗黑模式"
+    if st.button(toggle_icon, key="theme_toggle", use_container_width=True, help=toggle_help):
+        new_theme = "light" if theme == "dark" else "dark"
+        st.session_state["theme"] = new_theme
+        # 存入 URL 参数，刷新页面也能保持主题
+        st.query_params["theme"] = new_theme
         st.rerun()
 
 
@@ -463,7 +550,7 @@ else:
         border_color = "#222222"
         top_border_color = "#1a1a1a"
         card_bg = "#1a1a2e"
-    
+
     st.markdown(
         f"""
         <div style="display:flex; flex-direction:column; align-items:center; 

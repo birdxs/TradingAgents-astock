@@ -12,11 +12,13 @@ def _get_theme_colors() -> dict:
     theme = st.session_state.get("theme", "dark")
     if theme == "light":
         return {
-            "text": "#333333",
-            "muted": "#666666",
-            "active": "#333333",
-            "pending": "#999999",
-            "done": "#22c55e",
+            "text": "#1a1a2e",
+            "muted": "#5a5a6e",
+            "active": "#1a1a2e",
+            "pending": "#888888",
+            "done": "#22a05e",
+            "card_bg": "#ffffff",
+            "border": "#e8e8e8",
         }
     return {
         "text": "#f5f1eb",
@@ -24,6 +26,8 @@ def _get_theme_colors() -> dict:
         "active": "#f5f1eb",
         "pending": "#333333",
         "done": "#22c55e",
+        "card_bg": "#1a1a2e",
+        "border": "#333333",
     }
 
 
@@ -32,7 +36,7 @@ def _status_badge(status: str) -> str:
     if status == "done":
         return f'<span style="color:{colors["done"]}; font-size:1.3rem;">●</span>'
     if status == "active":
-        return '<span style="color:#ff5a1f; font-size:1.3rem;">◉</span>'
+        return '<span style="color:#e05a00; font-size:1.3rem;">◉</span>'
     return f'<span style="color:{colors["pending"]}; font-size:1.3rem;">○</span>'
 
 
@@ -86,7 +90,7 @@ def render_progress(tracker: ProgressTracker) -> None:
         label_color = colors["active"] if status == "active" else colors["pending"] if status == "pending" else colors["done"]
         col.markdown(
             f"""
-            <div style="text-align:center; padding:0.5rem 0;">
+            <div style="text-align:center; padding:0.5rem 0; background:{colors["card_bg"]}; border-radius:6px; margin:2px;">
                 {badge}<br>
                 <span style="font-size:0.75rem; color:{label_color};">{stage['name']}</span>
             </div>
@@ -106,7 +110,7 @@ def render_progress(tracker: ProgressTracker) -> None:
         label_color = colors["active"] if status == "active" else colors["pending"] if status == "pending" else colors["done"]
         col.markdown(
             f"""
-            <div style="text-align:center; padding:0.5rem 0;">
+            <div style="text-align:center; padding:0.5rem 0; background:{colors["card_bg"]}; border-radius:6px; margin:2px;">
                 {badge}<br>
                 <span style="font-size:0.75rem; color:{label_color};">{stage['name']}</span>
             </div>

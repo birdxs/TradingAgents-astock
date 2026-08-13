@@ -41,9 +41,9 @@ def _get_theme_colors() -> dict:
     theme = st.session_state.get("theme", "dark")
     if theme == "light":
         return {
-            "text": "#333333",
-            "muted": "#666666",
-            "link": "#ff5a1f",
+            "text": "#1a1a2e",
+            "muted": "#5a5a6e",
+            "link": "#e05a00",
         }
     return {
         "text": "#f5f1eb",
@@ -267,11 +267,11 @@ def render_sidebar() -> None:
     st.markdown(
         f"""
         <div style="text-align:center; margin-bottom:1.5rem;">
-            <span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Trading</span><span style="font-size:2rem; font-weight:800; color:{colors["text"]};">Agents</span><span style="font-size:2rem; font-weight:800; color:{colors["text"]};">-</span><span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Astock</span>
+            <span style="font-size:2rem; font-weight:800; color:#e05a00;">Trading</span><span style="font-size:2rem; font-weight:800; color:{colors["text"]};">Agents</span><span style="font-size:2rem; font-weight:800; color:{colors["text"]};">-</span><span style="font-size:2rem; font-weight:800; color:#e05a00;">Astock</span>
             <div style="font-size:0.85rem; color:{colors["muted"]}; margin-top:0.2rem;">
                 A股多Agent投研系统
             </div>
-            <div style="font-size:0.7rem; color:#555; margin-top:0.3rem;">
+            <div style="font-size:0.7rem; color:#888; margin-top:0.3rem;">
                 by <a href="https://github.com/simonlin1212" style="color:{colors["link"]}; text-decoration:none;">simonlin1212</a>
             </div>
         </div>

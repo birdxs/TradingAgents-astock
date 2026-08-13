@@ -44,7 +44,7 @@ if "theme" not in st.session_state:
 
 
 def _get_light_css() -> str:
-    """Return CSS for light theme."""
+    """Return CSS for light theme - 精心设计的明亮配色方案"""
     return """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
@@ -73,104 +73,264 @@ def _get_light_css() -> str:
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, sans-serif;
     }
+    
+    /* === 主背景和侧边栏 === */
     .stApp {
-        background: #ffffff !important;
+        background: #f0f2f5 !important;
     }
     section[data-testid="stSidebar"] {
-        background: #f8f9fa !important;
-        border-right: 1px solid #e0e0e0 !important;
+        background: #ffffff !important;
+        border-right: 1px solid #d9d9d9 !important;
     }
-    .stMetric label { color: #666 !important; font-size: 0.8rem !important; }
+    
+    /* === 文本颜色 === */
+    .stMarkdown, p, span, label, .stText {
+        color: #1a1a2e !important;
+    }
+    .stMetric label { 
+        color: #5a5a6e !important; 
+        font-size: 0.8rem !important; 
+    }
     .stMetric [data-testid="stMetricValue"] {
-        color: #ff5a1f !important;
+        color: #e05a00 !important;
         font-weight: 700 !important;
     }
+    
+    /* === 进度条 === */
     .stProgress > div > div > div {
-        background: linear-gradient(90deg, #ff5a1f, #ff8c42) !important;
+        background: linear-gradient(90deg, #e05a00, #ff7a33) !important;
     }
+    
+    /* === 主要按钮 === */
     button[kind="primary"] {
-        background: linear-gradient(135deg, #ff5a1f, #ff8c42) !important;
+        background: linear-gradient(135deg, #e05a00, #ff7a33) !important;
         border: none !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
-        letter-spacing: 0.05em !important;
-        box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
+        letter-spacing: 0.03em !important;
+        box-shadow: 0 2px 8px rgba(224,90,0,0.25) !important;
         transition: all 0.2s ease !important;
     }
     button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #e04d15, #ff5a1f) !important;
-        box-shadow: 0 6px 20px rgba(255,90,31,0.4) !important;
+        background: linear-gradient(135deg, #c54d00, #e05a00) !important;
+        box-shadow: 0 4px 12px rgba(224,90,0,0.35) !important;
         transform: translateY(-1px) !important;
     }
+    
+    /* === 次要按钮（历史记录等） === */
     button[kind="secondary"] {
         background: #ffffff !important;
-        border: 1px solid #d0d0d0 !important;
-        color: #333 !important;
+        border: 1px solid #d0d0d8 !important;
+        color: #3a3a4a !important;
         transition: all 0.2s ease !important;
     }
     button[kind="secondary"]:hover {
-        background: #f5f5f5 !important;
-        border-color: #ff5a1f !important;
-        color: #ff5a1f !important;
+        background: #f5f5f8 !important;
+        border-color: #e05a00 !important;
+        color: #e05a00 !important;
     }
+    
+    /* === 展开器 === */
     .stExpander {
-        border: 1px solid #e0e0e0 !important;
+        border: 1px solid #d9d9d9 !important;
         border-radius: 8px !important;
+        background: #ffffff !important;
     }
+    .stExpander [data-testid="stExpanderDetails"] {
+        background: #fafafa !important;
+        border-top: 1px solid #e8e8e8 !important;
+    }
+    
+    /* === Tab 标签 === */
     .stTabs [data-baseweb="tab"] {
-        color: #666 !important;
+        color: #5a5a6e !important;
+        background: transparent !important;
     }
     .stTabs [aria-selected="true"] {
-        color: #ff5a1f !important;
-        border-bottom-color: #ff5a1f !important;
+        color: #e05a00 !important;
+        border-bottom-color: #e05a00 !important;
     }
+    .stTabs [data-baseweb="tab-list"] {
+        background: #ffffff !important;
+        border-bottom: 1px solid #e8e8e8 !important;
+    }
+    .stTabs [data-baseweb="tab-panel"] {
+        background: #ffffff !important;
+        border: 1px solid #e8e8e8 !important;
+        border-top: none !important;
+        padding: 1rem !important;
+    }
+    
+    /* === 下载按钮 === */
     div[data-testid="stDownloadButton"] button {
         background: #ffffff !important;
-        border: 1px solid #ff5a1f !important;
-        color: #ff5a1f !important;
+        border: 1px solid #e05a00 !important;
+        color: #e05a00 !important;
+        font-weight: 600 !important;
     }
+    div[data-testid="stDownloadButton"] button:hover {
+        background: #fff5eb !important;
+        border-color: #c54d00 !important;
+        color: #c54d00 !important;
+    }
+    
+    /* === 文本输入框 === */
     input[data-testid="stTextInputRootElement"] input,
-    .stTextInput input {
+    .stTextInput input,
+    .stTextInput input::placeholder {
         background: #ffffff !important;
-        border-color: #d0d0d0 !important;
-        color: #333333 !important;
+        border-color: #d0d0d8 !important;
+        color: #1a1a2e !important;
     }
     .stTextInput input:focus {
-        border-color: #ff5a1f !important;
-        box-shadow: 0 0 0 1px #ff5a1f !important;
+        border-color: #e05a00 !important;
+        box-shadow: 0 0 0 2px rgba(224,90,0,0.15) !important;
     }
+    .stTextInput label {
+        color: #3a3a4a !important;
+    }
+    
+    /* === 日期输入框 === */
     .stDateInput input {
         background: #ffffff !important;
-        border-color: #d0d0d0 !important;
-        color: #333333 !important;
+        border-color: #d0d0d8 !important;
+        color: #1a1a2e !important;
     }
-    /* Theme toggle button styling */
+    .stDateInput label {
+        color: #3a3a4a !important;
+    }
+    
+    /* === Selectbox 下拉框 === */
+    .stSelectbox > div > div {
+        background: #ffffff !important;
+        border-color: #d0d0d8 !important;
+        color: #1a1a2e !important;
+    }
+    .stSelectbox label {
+        color: #3a3a4a !important;
+    }
+    /* 下拉菜单选项 */
+    div[data-baseweb="popover"] > div,
+    div[data-baseweb="menu"] {
+        background: #ffffff !important;
+        border: 1px solid #d0d0d8 !important;
+    }
+    div[data-baseweb="option"]:hover {
+        background: #f5f0eb !important;
+    }
+    div[data-baseweb="option"] span {
+        color: #1a1a2e !important;
+    }
+    
+    /* === 文本区域 === */
+    .stTextArea textarea {
+        background: #ffffff !important;
+        border-color: #d0d0d8 !important;
+        color: #1a1a2e !important;
+    }
+    
+    /* === 复选框和单选按钮 === */
+    .stCheckbox label, .stRadio label {
+        color: #3a3a4a !important;
+    }
+    
+    /* === 分隔线 === */
+    hr {
+        border-color: #e8e8e8 !important;
+    }
+    
+    /* === 信息提示框 === */
+    div[data-testid="stAlert"] {
+        background: #f0f7ff !important;
+        border-color: #b3d4fc !important;
+        color: #1a4a7a !important;
+    }
+    div[data-testid="stSuccess"] {
+        background: #f0fff4 !important;
+        border-color: #9ae6b4 !important;
+        color: #22543d !important;
+    }
+    div[data-testid="stError"] {
+        background: #fff5f5 !important;
+        border-color: #feb2b2 !important;
+        color: #742a2a !important;
+    }
+    div[data-testid="stWarning"] {
+        background: #fffbeb !important;
+        border-color: #fbd38d !important;
+        color: #744210 !important;
+    }
+    
+    /* === 代码块 === */
+    code {
+        background: #f5f5f8 !important;
+        color: #e05a00 !important;
+        border: 1px solid #e8e8e8 !important;
+    }
+    pre {
+        background: #f8f8fa !important;
+        border: 1px solid #e8e8e8 !important;
+    }
+    
+    /* === 滚动条 === */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #f0f2f5 !important;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #c0c0c8 !important;
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a0a0a8 !important;
+    }
+    
+    /* === 主题切换按钮（左上角侧边栏下方） === */
     #theme-toggle-btn {
         position: fixed;
         bottom: 20px;
-        left: 20px;
+        right: 20px;
         z-index: 999999;
-        background: #f8f9fa;
-        border: 2px solid #ff5a1f;
-        color: #333333;
+        background: #ffffff;
+        border: 2px solid #e05a00;
+        color: #e05a00;
         padding: 10px 18px;
         border-radius: 25px;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(255,90,31,0.3);
+        box-shadow: 0 4px 15px rgba(224,90,0,0.2);
         transition: all 0.2s ease;
         font-family: 'Inter', sans-serif;
     }
     #theme-toggle-btn:hover {
         transform: scale(1.08);
-        box-shadow: 0 6px 25px rgba(255,90,31,0.5);
+        box-shadow: 0 6px 20px rgba(224,90,0,0.35);
+        background: #fff5eb;
     }
+    
+    /* === 主内容区域卡片 === */
+    div[data-testid="stVerticalBlock"] > div[data-testid="element-container"] {
+        background: transparent !important;
+    }
+    
+    /* === 指标卡片 === */
+    div[data-testid="stMetric"] {
+        background: #ffffff !important;
+        border: 1px solid #e8e8e8 !important;
+        border-radius: 8px !important;
+        padding: 0.8rem !important;
+    }
+    
     </style>
     """
 
 
 def _get_dark_css() -> str:
-    """Return CSS for dark theme."""
+    """Return CSS for dark theme - 保持原有配色不变"""
     return """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
@@ -280,11 +440,11 @@ def _get_dark_css() -> str:
         border-color: #2a2a2a !important;
         color: #f5f1eb !important;
     }
-    /* Theme toggle button styling */
+    /* Theme toggle button */
     #theme-toggle-btn {
         position: fixed;
         bottom: 20px;
-        left: 20px;
+        right: 20px;
         z-index: 999999;
         background: #0f0f0f;
         border: 2px solid #ff5a1f;
@@ -437,10 +597,18 @@ elif tracker and tracker.error:
 else:
     # Dynamic colors based on theme
     theme = st.session_state["theme"]
-    text_color = "#333333" if theme == "light" else "#f5f1eb"
-    muted_color = "#666666" if theme == "light" else "#888888"
-    border_color = "#e0e0e0" if theme == "light" else "#222222"
-    top_border_color = "#e0e0e0" if theme == "light" else "#1a1a1a"
+    if theme == "light":
+        text_color = "#1a1a2e"
+        muted_color = "#5a5a6e"
+        border_color = "#d9d9d9"
+        top_border_color = "#e8e8e8"
+        card_bg = "#ffffff"
+    else:
+        text_color = "#f5f1eb"
+        muted_color = "#888888"
+        border_color = "#222222"
+        top_border_color = "#1a1a1a"
+        card_bg = "#1a1a2e"
     
     st.markdown(
         f"""
@@ -458,7 +626,7 @@ else:
                 font-weight: 900;
                 margin-bottom: 0.5rem;
             ">
-                <span style="color: #ff5a1f;">Trading</span><span style="color: {text_color};">Agents</span><span style="color: {text_color};">-</span><span style="color: #ff5a1f;">Astock</span>
+                <span style="color: #e05a00;">Trading</span><span style="color: {text_color};">Agents</span><span style="color: {text_color};">-</span><span style="color: #e05a00;">Astock</span>
             </div>
             <div style="color: {muted_color}; font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
                 A股多Agent投研分析系统<br>
@@ -467,10 +635,12 @@ else:
             <div style="
                 margin-top: 2rem;
                 padding: 1rem 2rem;
+                background: {card_bg};
                 border: 1px solid {border_color};
                 border-radius: 12px;
                 color: {muted_color};
                 font-size: 0.9rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             ">
                 ← 在左侧输入股票代码，开始分析
             </div>
@@ -492,7 +662,7 @@ else:
     )
 
 
-# ── Theme Toggle Button (Bottom-Left Corner) ────────────────────────────────
+# ── Theme Toggle Button (Bottom-Right Corner) ───────────────────────────────
 
 theme = st.session_state["theme"]
 if theme == "dark":
@@ -500,46 +670,25 @@ if theme == "dark":
 else:
     toggle_label = "☀️ 明亮模式"
 
-# Create a hidden container for the theme toggle
+# 使用固定定位的HTML按钮，放置在右下角
 st.markdown(
-    """
-    <style>
-    section[data-testid="stBlock"][data-stale="false"] {
-        position: relative;
-    }
-    </style>
+    f"""
+    <button id="theme-toggle-btn" onclick="toggleTheme()">{toggle_label}</button>
+    <script>
+        function toggleTheme() {{
+            // 通过查询参数传递主题切换请求
+            const url = new URL(window.location.href);
+            url.searchParams.set('theme_toggle', '1');
+            window.location.href = url.toString();
+        }}
+    </script>
     """,
     unsafe_allow_html=True,
 )
 
-# Use a small column at the bottom for the toggle
-col1, col2, col3 = st.columns([1, 2, 1])
-with col1:
-    if st.button(toggle_label, key="theme_toggle_button", use_container_width=True):
-        st.session_state["theme"] = "light" if theme == "dark" else "dark"
-        st.rerun()
-
-# Add CSS to position the button at bottom-left
-st.markdown(
-    """
-    <style>
-    div[data-testid="stHorizontalBlock"]:last-of-type {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        z-index: 999999;
-        width: auto !important;
-        max-width: 200px;
-    }
-    div[data-testid="stHorizontalBlock"]:last-of-type > div {
-        min-width: auto !important;
-        width: auto !important;
-    }
-    div[data-testid="stHorizontalBlock"]:last-of-type > div:nth-child(2),
-    div[data-testid="stHorizontalBlock"]:last-of-type > div:nth-child(3) {
-        display: none !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# 检查是否需要切换主题（通过URL参数）
+if st.query_params.get("theme_toggle") == ["1"]:
+    # 清除参数并切换主题
+    st.query_params.clear()
+    st.session_state["theme"] = "light" if theme == "dark" else "dark"
+    st.rerun()

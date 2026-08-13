@@ -16,16 +16,18 @@ def _get_theme_colors() -> dict:
     theme = st.session_state.get("theme", "dark")
     if theme == "light":
         return {
-            "card_bg": "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-            "card_border": "#dee2e6",
-            "text": "#333333",
-            "muted": "#666666",
+            "card_bg": "#ffffff",
+            "card_border": "#d9d9d9",
+            "text": "#1a1a2e",
+            "muted": "#5a5a6e",
+            "shadow": "rgba(0,0,0,0.08)",
         }
     return {
         "card_bg": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
         "card_border": "#333333",
         "text": "#f5f1eb",
         "muted": "#888888",
+        "shadow": "rgba(0,0,0,0.3)",
     }
 
 
@@ -36,10 +38,10 @@ def _strip_think(text: str) -> str:
 def _signal_style(signal: str) -> tuple[str, str]:
     s = signal.upper()
     if "BUY" in s:
-        return "#22c55e", "买入"
+        return "#22a05e", "买入"
     if "SELL" in s:
-        return "#ef4444", "卖出"
-    return "#fbbf24", "持有"
+        return "#d93025", "卖出"
+    return "#b8860b", "持有"
 
 
 _ANALYST_SECTIONS = [
@@ -80,15 +82,22 @@ def render_report(
         m, s = divmod(int(elapsed), 60)
         stats_html = f'<div style="font-size:0.9rem; color:{colors["muted"]}; margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
 
+    # 根据主题选择背景样式
+    if st.session_state.get("theme", "dark") == "light":
+        bg_style = f"background: {colors['card_bg']};"
+    else:
+        bg_style = f"background: {colors['card_bg']};"
+
     st.markdown(
         f"""
         <div style="
-            background: {colors["card_bg"]};
+            {bg_style}
             border: 1px solid {colors["card_border"]};
             border-radius: 16px;
             padding: 2rem;
             text-align: center;
             margin: 1rem 0 2rem;
+            box-shadow: 0 4px 12px {colors["shadow"]};
         ">
             <div style="font-size:0.9rem; color:{colors["muted"]}; letter-spacing:2px;">TRADING SIGNAL</div>
             <div style="font-size:3.5rem; font-weight:900; color:{color}; margin:0.3rem 0;">

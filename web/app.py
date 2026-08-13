@@ -44,19 +44,16 @@ if "theme" not in st.session_state:
 
 
 def _get_light_css() -> str:
-    """Return CSS for light theme - 精心设计的明亮配色方案"""
+    """Return CSS for light theme"""
     return """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
-    /* Hide Streamlit chrome */
-    #MainMenu,
-    footer,
-    div[data-testid="stDecoration"],
-    div[data-testid="stStatusWidget"],
-    div[data-testid="stToolbarActions"],
-    div[data-testid="stAppDeployButton"],
-    span[data-testid="stMainMenu"] { display: none !important; }
+    #MainMenu, footer, div[data-testid="stDecoration"],
+    div[data-testid="stStatusWidget"], div[data-testid="stToolbarActions"],
+    div[data-testid="stAppDeployButton"], span[data-testid="stMainMenu"] { 
+        display: none !important; 
+    }
     header[data-testid="stHeader"] {
         background: transparent !important;
         box-shadow: none !important;
@@ -74,40 +71,26 @@ def _get_light_css() -> str:
         font-family: 'Inter', -apple-system, sans-serif;
     }
     
-    /* === 主背景和侧边栏 === */
-    .stApp {
-        background: #f0f2f5 !important;
-    }
+    .stApp { background: #f0f2f5 !important; }
     section[data-testid="stSidebar"] {
         background: #ffffff !important;
         border-right: 1px solid #d9d9d9 !important;
     }
     
-    /* === 文本颜色 === */
-    .stMarkdown, p, span, label, .stText {
-        color: #1a1a2e !important;
-    }
-    .stMetric label { 
-        color: #5a5a6e !important; 
-        font-size: 0.8rem !important; 
-    }
+    .stMarkdown, p, span, label, .stText { color: #1a1a2e !important; }
+    .stMetric label { color: #5a5a6e !important; font-size: 0.8rem !important; }
     .stMetric [data-testid="stMetricValue"] {
-        color: #e05a00 !important;
-        font-weight: 700 !important;
+        color: #e05a00 !important; font-weight: 700 !important;
     }
     
-    /* === 进度条 === */
     .stProgress > div > div > div {
         background: linear-gradient(90deg, #e05a00, #ff7a33) !important;
     }
     
-    /* === 主要按钮 === */
     button[kind="primary"] {
         background: linear-gradient(135deg, #e05a00, #ff7a33) !important;
-        border: none !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.03em !important;
+        border: none !important; color: #ffffff !important;
+        font-weight: 700 !important; letter-spacing: 0.03em !important;
         box-shadow: 0 2px 8px rgba(224,90,0,0.25) !important;
         transition: all 0.2s ease !important;
     }
@@ -117,275 +100,173 @@ def _get_light_css() -> str:
         transform: translateY(-1px) !important;
     }
     
-    /* === 次要按钮（历史记录等） === */
     button[kind="secondary"] {
-        background: #ffffff !important;
-        border: 1px solid #d0d0d8 !important;
-        color: #3a3a4a !important;
-        transition: all 0.2s ease !important;
+        background: #ffffff !important; border: 1px solid #d0d0d8 !important;
+        color: #3a3a4a !important; transition: all 0.2s ease !important;
     }
     button[kind="secondary"]:hover {
-        background: #f5f5f8 !important;
-        border-color: #e05a00 !important;
+        background: #f5f5f8 !important; border-color: #e05a00 !important;
         color: #e05a00 !important;
     }
     
-    /* === 展开器 === */
     .stExpander {
-        border: 1px solid #d9d9d9 !important;
-        border-radius: 8px !important;
+        border: 1px solid #d9d9d9 !important; border-radius: 8px !important;
         background: #ffffff !important;
     }
     .stExpander [data-testid="stExpanderDetails"] {
-        background: #fafafa !important;
-        border-top: 1px solid #e8e8e8 !important;
+        background: #fafafa !important; border-top: 1px solid #e8e8e8 !important;
     }
     
-    /* === Tab 标签 === */
-    .stTabs [data-baseweb="tab"] {
-        color: #5a5a6e !important;
-        background: transparent !important;
-    }
+    .stTabs [data-baseweb="tab"] { color: #5a5a6e !important; background: transparent !important; }
     .stTabs [aria-selected="true"] {
-        color: #e05a00 !important;
-        border-bottom-color: #e05a00 !important;
+        color: #e05a00 !important; border-bottom-color: #e05a00 !important;
     }
     .stTabs [data-baseweb="tab-list"] {
-        background: #ffffff !important;
-        border-bottom: 1px solid #e8e8e8 !important;
+        background: #ffffff !important; border-bottom: 1px solid #e8e8e8 !important;
     }
     .stTabs [data-baseweb="tab-panel"] {
-        background: #ffffff !important;
-        border: 1px solid #e8e8e8 !important;
-        border-top: none !important;
-        padding: 1rem !important;
+        background: #ffffff !important; border: 1px solid #e8e8e8 !important;
+        border-top: none !important; padding: 1rem !important;
     }
     
-    /* === 下载按钮 === */
     div[data-testid="stDownloadButton"] button {
-        background: #ffffff !important;
-        border: 1px solid #e05a00 !important;
-        color: #e05a00 !important;
-        font-weight: 600 !important;
+        background: #ffffff !important; border: 1px solid #e05a00 !important;
+        color: #e05a00 !important; font-weight: 600 !important;
     }
     div[data-testid="stDownloadButton"] button:hover {
-        background: #fff5eb !important;
-        border-color: #c54d00 !important;
+        background: #fff5eb !important; border-color: #c54d00 !important;
         color: #c54d00 !important;
     }
     
-    /* === 文本输入框 === */
-    input[data-testid="stTextInputRootElement"] input,
-    .stTextInput input,
-    .stTextInput input::placeholder {
-        background: #ffffff !important;
-        border-color: #d0d0d8 !important;
+    input[data-testid="stTextInputRootElement"] input, .stTextInput input {
+        background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
     .stTextInput input:focus {
         border-color: #e05a00 !important;
         box-shadow: 0 0 0 2px rgba(224,90,0,0.15) !important;
     }
-    .stTextInput label {
-        color: #3a3a4a !important;
-    }
+    .stTextInput label { color: #3a3a4a !important; }
     
-    /* === 日期输入框 === */
     .stDateInput input {
-        background: #ffffff !important;
-        border-color: #d0d0d8 !important;
+        background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
-    .stDateInput label {
-        color: #3a3a4a !important;
-    }
+    .stDateInput label { color: #3a3a4a !important; }
     
-    /* === Selectbox 下拉框 === */
     .stSelectbox > div > div {
-        background: #ffffff !important;
-        border-color: #d0d0d8 !important;
+        background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
-    .stSelectbox label {
-        color: #3a3a4a !important;
+    .stSelectbox label { color: #3a3a4a !important; }
+    div[data-baseweb="popover"] > div, div[data-baseweb="menu"] {
+        background: #ffffff !important; border: 1px solid #d0d0d8 !important;
     }
-    /* 下拉菜单选项 */
-    div[data-baseweb="popover"] > div,
-    div[data-baseweb="menu"] {
-        background: #ffffff !important;
-        border: 1px solid #d0d0d8 !important;
-    }
-    div[data-baseweb="option"]:hover {
-        background: #f5f0eb !important;
-    }
-    div[data-baseweb="option"] span {
-        color: #1a1a2e !important;
-    }
+    div[data-baseweb="option"]:hover { background: #f5f0eb !important; }
+    div[data-baseweb="option"] span { color: #1a1a2e !important; }
     
-    /* === 文本区域 === */
     .stTextArea textarea {
-        background: #ffffff !important;
-        border-color: #d0d0d8 !important;
+        background: #ffffff !important; border-color: #d0d0d8 !important;
         color: #1a1a2e !important;
     }
     
-    /* === 复选框和单选按钮 === */
-    .stCheckbox label, .stRadio label {
-        color: #3a3a4a !important;
-    }
+    .stCheckbox label, .stRadio label { color: #3a3a4a !important; }
+    hr { border-color: #e8e8e8 !important; }
     
-    /* === 分隔线 === */
-    hr {
-        border-color: #e8e8e8 !important;
-    }
-    
-    /* === 信息提示框 === */
     div[data-testid="stAlert"] {
-        background: #f0f7ff !important;
-        border-color: #b3d4fc !important;
-        color: #1a4a7a !important;
+        background: #f0f7ff !important; border-color: #b3d4fc !important; color: #1a4a7a !important;
     }
     div[data-testid="stSuccess"] {
-        background: #f0fff4 !important;
-        border-color: #9ae6b4 !important;
-        color: #22543d !important;
+        background: #f0fff4 !important; border-color: #9ae6b4 !important; color: #22543d !important;
     }
     div[data-testid="stError"] {
-        background: #fff5f5 !important;
-        border-color: #feb2b2 !important;
-        color: #742a2a !important;
+        background: #fff5f5 !important; border-color: #feb2b2 !important; color: #742a2a !important;
     }
     div[data-testid="stWarning"] {
-        background: #fffbeb !important;
-        border-color: #fbd38d !important;
-        color: #744210 !important;
+        background: #fffbeb !important; border-color: #fbd38d !important; color: #744210 !important;
     }
     
-    /* === 代码块 === */
     code {
-        background: #f5f5f8 !important;
-        color: #e05a00 !important;
+        background: #f5f5f8 !important; color: #e05a00 !important;
         border: 1px solid #e8e8e8 !important;
     }
-    pre {
-        background: #f8f8fa !important;
-        border: 1px solid #e8e8e8 !important;
-    }
+    pre { background: #f8f8fa !important; border: 1px solid #e8e8e8 !important; }
     
-    /* === 滚动条 === */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-        background: #f0f2f5 !important;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #c0c0c8 !important;
-        border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: #a0a0a8 !important;
-    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f0f2f5 !important; }
+    ::-webkit-scrollbar-thumb { background: #c0c0c8 !important; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a0a0a8 !important; }
     
-    /* === 主题切换按钮（左上角侧边栏下方） === */
-    #theme-toggle-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 999999;
-        background: #ffffff;
-        border: 2px solid #e05a00;
-        color: #e05a00;
-        padding: 10px 18px;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(224,90,0,0.2);
-        transition: all 0.2s ease;
-        font-family: 'Inter', sans-serif;
-    }
-    #theme-toggle-btn:hover {
-        transform: scale(1.08);
-        box-shadow: 0 6px 20px rgba(224,90,0,0.35);
-        background: #fff5eb;
-    }
-    
-    /* === 主内容区域卡片 === */
-    div[data-testid="stVerticalBlock"] > div[data-testid="element-container"] {
-        background: transparent !important;
-    }
-    
-    /* === 指标卡片 === */
     div[data-testid="stMetric"] {
-        background: #ffffff !important;
-        border: 1px solid #e8e8e8 !important;
-        border-radius: 8px !important;
-        padding: 0.8rem !important;
+        background: #ffffff !important; border: 1px solid #e8e8e8 !important;
+        border-radius: 8px !important; padding: 0.8rem !important;
     }
     
+    /* Theme toggle button - fixed bottom right */
+    div[data-testid="theme-toggle-container"] {
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 999999 !important;
+    }
+    div[data-testid="theme-toggle-container"] button {
+        background: #ffffff !important;
+        border: 2px solid #e05a00 !important;
+        color: #e05a00 !important;
+        padding: 10px 20px !important;
+        border-radius: 25px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 15px rgba(224,90,0,0.2) !important;
+        transition: all 0.2s ease !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    div[data-testid="theme-toggle-container"] button:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 6px 20px rgba(224,90,0,0.35) !important;
+        background: #fff5eb !important;
+    }
     </style>
     """
 
 
 def _get_dark_css() -> str:
-    """Return CSS for dark theme - 保持原有配色不变"""
+    """Return CSS for dark theme - 保持原有配色"""
     return """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
-    /* Hide Streamlit chrome for clean video recording.
-       IMPORTANT: do NOT `display:none` the whole header OR the whole toolbar.
-       In Streamlit >= 1.36 the "expand sidebar" button lives *inside* the
-       toolbar (header > stToolbar > stExpandSidebarButton), so hiding either
-       one makes a collapsed sidebar impossible to reopen (issue #36). Instead
-       keep the header/toolbar in the DOM, make the header transparent, and
-       hide only the individual chrome widgets we don't want on camera. */
-    #MainMenu,
-    footer,
-    div[data-testid="stDecoration"],
-    div[data-testid="stStatusWidget"],
-    div[data-testid="stToolbarActions"],
-    div[data-testid="stAppDeployButton"],
-    span[data-testid="stMainMenu"] { display: none !important; }
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        box-shadow: none !important;
+    #MainMenu, footer, div[data-testid="stDecoration"],
+    div[data-testid="stStatusWidget"], div[data-testid="stToolbarActions"],
+    div[data-testid="stAppDeployButton"], span[data-testid="stMainMenu"] { 
+        display: none !important; 
     }
-    /* Keep the sidebar collapse / expand controls always visible & clickable.
-       Selector list spans multiple Streamlit versions. */
+    header[data-testid="stHeader"] {
+        background: transparent !important; box-shadow: none !important;
+    }
     button[data-testid="stExpandSidebarButton"],
     button[data-testid="stSidebarCollapseButton"],
     button[data-testid="collapsedControl"],
     [data-testid="stSidebarCollapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+        display: flex !important; visibility: visible !important; opacity: 1 !important;
     }
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, sans-serif;
-    }
-    .stApp {
-        background: #0a0a0a !important;
-    }
+    html, body, [class*="css"] { font-family: 'Inter', -apple-system, sans-serif; }
+    .stApp { background: #0a0a0a !important; }
     section[data-testid="stSidebar"] {
-        background: #0f0f0f !important;
-        border-right: 1px solid #1a1a1a !important;
+        background: #0f0f0f !important; border-right: 1px solid #1a1a1a !important;
     }
     .stMetric label { color: #888 !important; font-size: 0.8rem !important; }
     .stMetric [data-testid="stMetricValue"] {
-        color: #ff5a1f !important;
-        font-weight: 700 !important;
+        color: #ff5a1f !important; font-weight: 700 !important;
     }
     .stProgress > div > div > div {
         background: linear-gradient(90deg, #ff5a1f, #ff8c42) !important;
     }
     button[kind="primary"] {
         background: linear-gradient(135deg, #ff5a1f, #ff8c42) !important;
-        border: none !important;
-        font-weight: 700 !important;
+        border: none !important; font-weight: 700 !important;
         letter-spacing: 0.05em !important;
         box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
         transition: all 0.2s ease !important;
@@ -395,78 +276,64 @@ def _get_dark_css() -> str:
         box-shadow: 0 6px 20px rgba(255,90,31,0.4) !important;
         transform: translateY(-1px) !important;
     }
-    /* Secondary buttons (history items) */
     button[kind="secondary"] {
-        background: #161616 !important;
-        border: 1px solid #2a2a2a !important;
-        color: #ccc !important;
-        transition: all 0.2s ease !important;
+        background: #161616 !important; border: 1px solid #2a2a2a !important;
+        color: #ccc !important; transition: all 0.2s ease !important;
     }
     button[kind="secondary"]:hover {
-        background: #1e1e1e !important;
-        border-color: #ff5a1f !important;
+        background: #1e1e1e !important; border-color: #ff5a1f !important;
         color: #ff5a1f !important;
     }
-    .stExpander {
-        border: 1px solid #222 !important;
-        border-radius: 8px !important;
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: #888 !important;
-    }
+    .stExpander { border: 1px solid #222 !important; border-radius: 8px !important; }
+    .stTabs [data-baseweb="tab"] { color: #888 !important; }
     .stTabs [aria-selected="true"] {
-        color: #ff5a1f !important;
-        border-bottom-color: #ff5a1f !important;
+        color: #ff5a1f !important; border-bottom-color: #ff5a1f !important;
     }
     div[data-testid="stDownloadButton"] button {
-        background: #1a1a2e !important;
-        border: 1px solid #ff5a1f !important;
+        background: #1a1a2e !important; border: 1px solid #ff5a1f !important;
         color: #ff5a1f !important;
     }
-    /* Text input styling */
-    input[data-testid="stTextInputRootElement"] input,
-    .stTextInput input {
-        background: #161616 !important;
-        border-color: #2a2a2a !important;
+    input[data-testid="stTextInputRootElement"] input, .stTextInput input {
+        background: #161616 !important; border-color: #2a2a2a !important;
         color: #f5f1eb !important;
     }
     .stTextInput input:focus {
-        border-color: #ff5a1f !important;
-        box-shadow: 0 0 0 1px #ff5a1f !important;
+        border-color: #ff5a1f !important; box-shadow: 0 0 0 1px #ff5a1f !important;
     }
-    /* Date input styling */
     .stDateInput input {
-        background: #161616 !important;
-        border-color: #2a2a2a !important;
+        background: #161616 !important; border-color: #2a2a2a !important;
         color: #f5f1eb !important;
     }
-    /* Theme toggle button */
-    #theme-toggle-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 999999;
-        background: #0f0f0f;
-        border: 2px solid #ff5a1f;
-        color: #f5f1eb;
-        padding: 10px 18px;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(255,90,31,0.3);
-        transition: all 0.2s ease;
-        font-family: 'Inter', sans-serif;
+    
+    /* Theme toggle button - fixed bottom right */
+    div[data-testid="theme-toggle-container"] {
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 999999 !important;
     }
-    #theme-toggle-btn:hover {
-        transform: scale(1.08);
-        box-shadow: 0 6px 25px rgba(255,90,31,0.5);
+    div[data-testid="theme-toggle-container"] button {
+        background: #0f0f0f !important;
+        border: 2px solid #ff5a1f !important;
+        color: #f5f1eb !important;
+        padding: 10px 20px !important;
+        border-radius: 25px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
+        transition: all 0.2s ease !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    div[data-testid="theme-toggle-container"] button:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 6px 25px rgba(255,90,31,0.5) !important;
     }
     </style>
     """
 
 
-# Apply theme CSS based on current theme
+# Apply theme CSS
 if st.session_state["theme"] == "light":
     st.markdown(_get_light_css(), unsafe_allow_html=True)
 else:
@@ -480,7 +347,6 @@ def _build_config() -> dict:
     config["llm_provider"] = st.session_state.get("llm_provider", "minimax")
     config["deep_think_llm"] = st.session_state.get("deep_think_llm", "MiniMax-M2.7")
     config["quick_think_llm"] = st.session_state.get("quick_think_llm", "MiniMax-M2.7-highspeed")
-    # Optional third-party / proxy endpoint. Sidebar input wins, else .env BACKEND_URL.
     backend_url = (st.session_state.get("llm_base_url") or os.getenv("BACKEND_URL") or "").strip()
     config["backend_url"] = backend_url or None
     config["data_vendors"] = {
@@ -490,21 +356,12 @@ def _build_config() -> dict:
         "news_data": "a_stock",
         "signal_data": "a_stock",
     }
-    # Analysis window (#16): start-date input in the sidebar → look-back days.
     config["market_lookback_days"] = st.session_state.get("market_lookback_days")
     config["max_debate_rounds"] = 1
     config["max_risk_discuss_rounds"] = 1
     config["checkpoint_enabled"] = True
     config["output_language"] = "Chinese"
-    # Optional: route nodes through a personal Claude Pro/Max subscription (Agent
-    # SDK). Scope: "deep" = Research/Portfolio only; "all" = + the 7 analysts.
-    # Leaving the fallback keys None makes the graph fall back to the
-    # sidebar-selected llm_provider + models on quota/failure.
     scope = st.session_state.get("subscription_scope", "off")
-    # 侧栏那个输入框只配**深度节点**的模型。不要把它同时赋给 quick——
-    # quick 节点有 7 个分析师 + 多空/交易员/风险辩手，把深度节点的 opus 复制过去
-    # 会让订阅额度烧得极快，也与 README / 侧栏提示所说的「quick 默认 sonnet」矛盾。
-    # quick 的模型交给 DEFAULT_CONFIG（默认 sonnet），需要时在 config 层单独覆盖。
     sub_model = st.session_state.get("agent_sdk_model")
     if scope in ("deep", "all"):
         config["deep_think_provider_override"] = "claude_agent_sdk"
@@ -595,7 +452,6 @@ elif tracker and tracker.error:
 
 # State 0: Idle — welcome screen
 else:
-    # Dynamic colors based on theme
     theme = st.session_state["theme"]
     if theme == "light":
         text_color = "#1a1a2e"
@@ -612,47 +468,28 @@ else:
     
     st.markdown(
         f"""
-        <div style="
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 60vh;
-            text-align: center;
-        ">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">📈</div>
-            <div style="
-                font-size: 2.5rem;
-                font-weight: 900;
-                margin-bottom: 0.5rem;
-            ">
-                <span style="color: #e05a00;">Trading</span><span style="color: {text_color};">Agents</span><span style="color: {text_color};">-</span><span style="color: #e05a00;">Astock</span>
+        <div style="display:flex; flex-direction:column; align-items:center; 
+                     justify-content:center; min-height:60vh; text-align:center;">
+            <div style="font-size:4rem; margin-bottom:1rem;">📈</div>
+            <div style="font-size:2.5rem; font-weight:900; margin-bottom:0.5rem;">
+                <span style="color:#e05a00;">Trading</span>
+                <span style="color:{text_color};">Agents</span>
+                <span style="color:{text_color};">-</span>
+                <span style="color:#e05a00;">Astock</span>
             </div>
-            <div style="color: {muted_color}; font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
+            <div style="color:{muted_color}; font-size:1.1rem; max-width:500px; line-height:1.6;">
                 A股多Agent投研分析系统<br>
                 7位AI分析师 → 质量门控 → 多空辩论 → 风控评估 → 最终决策
             </div>
-            <div style="
-                margin-top: 2rem;
-                padding: 1rem 2rem;
-                background: {card_bg};
-                border: 1px solid {border_color};
-                border-radius: 12px;
-                color: {muted_color};
-                font-size: 0.9rem;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            ">
+            <div style="margin-top:2rem; padding:1rem 2rem; background:{card_bg};
+                        border:1px solid {border_color}; border-radius:12px;
+                        color:{muted_color}; font-size:0.9rem;
+                        box-shadow:0 2px 8px rgba(0,0,0,0.05);">
                 ← 在左侧输入股票代码，开始分析
             </div>
-            <div style="
-                margin-top: 2.5rem;
-                padding: 0.8rem 1.5rem;
-                color: {muted_color};
-                font-size: 0.75rem;
-                max-width: 500px;
-                line-height: 1.6;
-                border-top: 1px solid {top_border_color};
-            ">
+            <div style="margin-top:2.5rem; padding:0.8rem 1.5rem; color:{muted_color};
+                        font-size:0.75rem; max-width:500px; line-height:1.6;
+                        border-top:1px solid {top_border_color};">
                 ⚠️ 本项目仅供学习研究与技术演示，不构成任何投资建议。<br>
                 投资决策请咨询持牌专业机构。作者不对使用本工具产生的任何损失承担责任。
             </div>
@@ -662,33 +499,21 @@ else:
     )
 
 
-# ── Theme Toggle Button (Bottom-Right Corner) ───────────────────────────────
+# ── Theme Toggle Button (Fixed Bottom-Right) ────────────────────────────────
 
-theme = st.session_state["theme"]
-if theme == "dark":
-    toggle_label = "🌙 暗黑模式"
-else:
-    toggle_label = "☀️ 明亮模式"
+# Create a container for the theme toggle button at the end of the page
+st.markdown("<div style='height: 80px;'></div>", unsafe_allow_html=True)
 
-# 使用固定定位的HTML按钮，放置在右下角
-st.markdown(
-    f"""
-    <button id="theme-toggle-btn" onclick="toggleTheme()">{toggle_label}</button>
-    <script>
-        function toggleTheme() {{
-            // 通过查询参数传递主题切换请求
-            const url = new URL(window.location.href);
-            url.searchParams.set('theme_toggle', '1');
-            window.location.href = url.toString();
-        }}
-    </script>
-    """,
-    unsafe_allow_html=True,
-)
-
-# 检查是否需要切换主题（通过URL参数）
-if st.query_params.get("theme_toggle") == ["1"]:
-    # 清除参数并切换主题
-    st.query_params.clear()
-    st.session_state["theme"] = "light" if theme == "dark" else "dark"
-    st.rerun()
+# Use st.container with a specific testid for the toggle
+with st.container():
+    st.markdown('<div data-testid="theme-toggle-container">', unsafe_allow_html=True)
+    theme = st.session_state["theme"]
+    if theme == "dark":
+        toggle_label = "🌙 暗黑模式"
+    else:
+        toggle_label = "☀️ 明亮模式"
+    
+    if st.button(toggle_label, key="theme_toggle"):
+        st.session_state["theme"] = "light" if theme == "dark" else "dark"
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)

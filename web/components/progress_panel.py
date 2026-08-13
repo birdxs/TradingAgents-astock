@@ -7,37 +7,16 @@ import streamlit as st
 from web.progress import PIPELINE_STAGES, ProgressTracker
 
 
-def _get_theme_colors() -> dict:
-    """Get colors based on current theme."""
-    theme = st.session_state.get("theme", "dark")
-    if theme == "light":
-        return {
-            "text": "#1a1a2e",
-            "muted": "#5a5a6e",
-            "active": "#1a1a2e",
-            "pending": "#888888",
-            "done": "#22a05e",
-            "card_bg": "#ffffff",
-            "border": "#e8e8e8",
-        }
-    return {
-        "text": "#f5f1eb",
-        "muted": "#888888",
-        "active": "#f5f1eb",
-        "pending": "#333333",
-        "done": "#22c55e",
-        "card_bg": "#1a1a2e",
-        "border": "#333333",
-    }
-
-
 def _status_badge(status: str) -> str:
-    colors = _get_theme_colors()
+    """渲染状态小圆点：done=绿色 ●，active=橙色 ◉，pending=灰色 ○。
+    
+    颜色使用固定值（与原项目一致），不依赖主题变量，因为它们是功能状态色。
+    """
     if status == "done":
-        return f'<span style="color:{colors["done"]}; font-size:1.3rem;">●</span>'
+        return '<span style="color:#22c55e; font-size:1.3rem;">●</span>'
     if status == "active":
-        return '<span style="color:#e05a00; font-size:1.3rem;">◉</span>'
-    return f'<span style="color:{colors["pending"]}; font-size:1.3rem;">○</span>'
+        return '<span style="color:#ff5a1f; font-size:1.3rem;">◉</span>'
+    return '<span style="color:var(--text-secondary); font-size:1.3rem;">○</span>'
 
 
 def _format_time(seconds: float) -> str:
@@ -46,16 +25,18 @@ def _format_time(seconds: float) -> str:
 
 
 def render_progress(tracker: ProgressTracker) -> None:
-    """Render the pipeline progress panel."""
-    colors = _get_theme_colors()
-
+    """Render the pipeline progress panel.
+    
+    所有文字颜色通过 CSS 变量（var(--text), var(--text-secondary)）动态适配主题，
+    卡片背景使用 var(--sidebar-bg) 自动匹配明亮/暗黑模式。
+    """
     st.markdown(
         f"""
         <div style="text-align:center; margin:1rem 0 0.5rem;">
-            <span style="font-size:1.6rem; font-weight:700; color:{colors["text"]};">
+            <span style="font-size:1.6rem; font-weight:700; color:var(--text);">
                 分析进行中
             </span>
-            <span style="font-size:1.1rem; color:{colors["muted"]}; margin-left:0.8rem;">
+            <span style="font-size:1.1rem; color:var(--text-secondary); margin-left:0.8rem;">
                 {tracker.ticker}
             </span>
         </div>
@@ -79,7 +60,7 @@ def render_progress(tracker: ProgressTracker) -> None:
     post_stages = PIPELINE_STAGES[7:]
 
     st.markdown(
-        f'<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:{colors["muted"]};">ANALYSTS</div>',
+        '<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:var(--text-secondary);">ANALYSTS</div>',
         unsafe_allow_html=True,
     )
 
@@ -87,10 +68,11 @@ def render_progress(tracker: ProgressTracker) -> None:
     for col, stage in zip(cols, analyst_stages):
         status = tracker.stage_status(stage["id"])
         badge = _status_badge(status)
-        label_color = colors["active"] if status == "active" else colors["pending"] if status == "pending" else colors["done"]
+        # 标签颜色：active 用主文本色，pending/done 用次文本色（CSS 变量自动适配）
+        label_color = "var(--text)" if status == "active" else "var(--text-secondary)"
         col.markdown(
             f"""
-            <div style="text-align:center; padding:0.5rem 0; background:{colors["card_bg"]}; border-radius:6px; margin:2px;">
+            <div style="text-align:center; padding:0.5rem 0; background:var(--sidebar-bg); border-radius:6px; margin:2px;">
                 {badge}<br>
                 <span style="font-size:0.75rem; color:{label_color};">{stage['name']}</span>
             </div>
@@ -99,7 +81,7 @@ def render_progress(tracker: ProgressTracker) -> None:
         )
 
     st.markdown(
-        f'<div style="margin:0.8rem 0 0.3rem; font-size:0.85rem; color:{colors["muted"]};">PIPELINE</div>',
+        '<div style="margin:0.8rem 0 0.3rem; font-size:0.85rem; color:var(--text-secondary);">PIPELINE</div>',
         unsafe_allow_html=True,
     )
 
@@ -107,10 +89,10 @@ def render_progress(tracker: ProgressTracker) -> None:
     for col, stage in zip(cols2, post_stages):
         status = tracker.stage_status(stage["id"])
         badge = _status_badge(status)
-        label_color = colors["active"] if status == "active" else colors["pending"] if status == "pending" else colors["done"]
+        label_color = "var(--text)" if status == "active" else "var(--text-secondary)"
         col.markdown(
             f"""
-            <div style="text-align:center; padding:0.5rem 0; background:{colors["card_bg"]}; border-radius:6px; margin:2px;">
+            <div style="text-align:center; padding:0.5rem 0; background:var(--sidebar-bg); border-radius:6px; margin:2px;">
                 {badge}<br>
                 <span style="font-size:0.75rem; color:{label_color};">{stage['name']}</span>
             </div>
@@ -137,7 +119,7 @@ def render_progress(tracker: ProgressTracker) -> None:
 
     if completed_reports:
         st.markdown(
-            f'<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:{colors["muted"]};">'
+            f'<div style="margin:0.5rem 0 0.3rem; font-size:0.85rem; color:var(--text-secondary);">'
             f"REPORTS ({len(completed_reports)})</div>",
             unsafe_allow_html=True,
         )

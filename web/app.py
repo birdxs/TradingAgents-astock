@@ -17,6 +17,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 load_dotenv(_PROJECT_ROOT / ".env", override=True)
 
 from tradingagents.default_config import DEFAULT_CONFIG  # noqa: E402
+
 from web.components.progress_panel import render_progress  # noqa: E402
 from web.components.report_viewer import render_report  # noqa: E402
 from web.components.sidebar import render_sidebar  # noqa: E402
@@ -33,391 +34,378 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Theme Management（支持 URL 持久化）────────────────────────────────────
+# ── Theme configuration（CSS 变量架构）──────────────────────────────────────
 
-_initial_theme = st.session_state.get("theme")
-if _initial_theme is None:
-    # 首次加载：从 URL 参数恢复主题（刷新页面不丢失）
+# 主题配色方案：所有颜色通过 CSS 变量注入，一套模板适配两个主题。
+# dark 配色与原项目暗黑主题完全一致。
+_THEMES = {
+    "light": {
+        "bg": "#ffffff",
+        "sidebar_bg": "#f5f5f5",
+        "text": "#1a1a1a",
+        "text_secondary": "#666666",
+        "border": "#e0e0e0",
+        "input_bg": "#ffffff",
+        "input_border": "#d0d0d0",
+        "button_secondary_bg": "#f5f5f5",
+        "button_secondary_border": "#d0d0d0",
+        "button_secondary_hover": "#e8e8e8",
+    },
+    "dark": {
+        "bg": "#0a0a0a",
+        "sidebar_bg": "#0f0f0f",
+        "text": "#f5f1eb",
+        "text_secondary": "#888888",
+        "border": "#1a1a1a",
+        "input_bg": "#161616",
+        "input_border": "#2a2a2a",
+        "button_secondary_bg": "#161616",
+        "button_secondary_border": "#2a2a2a",
+        "button_secondary_hover": "#1e1e1e",
+    },
+}
+
+# 主题持久化：存到 URL 参数，刷新页面不丢失
+if "theme" not in st.session_state:
     saved = st.query_params.get("theme", "dark")
     if isinstance(saved, list):
         saved = saved[0] if saved else "dark"
     st.session_state["theme"] = saved if saved in ("light", "dark") else "dark"
 
 
-def _get_light_css() -> str:
-    """Return CSS for light theme"""
-    return """
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-
-    #MainMenu, footer, div[data-testid="stDecoration"],
-    div[data-testid="stStatusWidget"], div[data-testid="stToolbarActions"],
-    div[data-testid="stAppDeployButton"], span[data-testid="stMainMenu"] { 
-        display: none !important; 
-    }
-    header[data-testid="stHeader"] {
-        background: transparent !important; box-shadow: none !important;
-    }
-    button[data-testid="stExpandSidebarButton"],
-    button[data-testid="stSidebarCollapseButton"],
-    button[data-testid="collapsedControl"],
-    [data-testid="stSidebarCollapsedControl"] {
-        display: flex !important; visibility: visible !important; opacity: 1 !important;
-    }
-
-    html, body, [class*="css"] { font-family: 'Inter', -apple-system, sans-serif; }
-    .stApp { background: #f0f2f5 !important; }
-    section[data-testid="stSidebar"] {
-        background: #ffffff !important; border-right: 1px solid #d9d9d9 !important;
-    }
-
-    /* 主文本 */
-    .stMarkdown, p, span, label, .stText { color: #1a1a2e !important; }
-    .stMetric label { color: #5a5a6e !important; font-size: 0.8rem !important; }
-    .stMetric [data-testid="stMetricValue"] {
-        color: #e05a00 !important; font-weight: 700 !important;
-    }
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #e05a00, #ff7a33) !important;
-    }
-
-    /* 按钮 */
-    button[kind="primary"] {
-        background: linear-gradient(135deg, #e05a00, #ff7a33) !important;
-        border: none !important; color: #ffffff !important;
-        font-weight: 700 !important;
-        box-shadow: 0 2px 8px rgba(224,90,0,0.25) !important;
-    }
-    button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #c54d00, #e05a00) !important;
-    }
-    button[kind="secondary"] {
-        background: #ffffff !important; border: 1px solid #d0d0d8 !important;
-        color: #3a3a4a !important;
-    }
-    button[kind="secondary"]:hover {
-        background: #f5f5f8 !important; border-color: #e05a00 !important;
-        color: #e05a00 !important;
-    }
-
-    /* === Expander：所有状态（含展开后 hover 移开）都保持浅色 === */
-    div[data-testid="stExpander"] {
-        border: 1px solid #d9d9d9 !important;
-        border-radius: 8px !important;
-        background: #ffffff !important;
-    }
-    /* 头部（role=button），涵盖折叠/展开/悬停全部状态 */
-    div[data-testid="stExpander"] div[role="button"] {
-        background: #ffffff !important;
-        color: #1a1a2e !important;
-    }
-    div[data-testid="stExpander"] div[role="button"]:hover {
-        background: #f5f5f8 !important;
-        color: #1a1a2e !important;
-    }
-    div[data-testid="stExpander"] div[role="button"] span,
-    div[data-testid="stExpander"] div[role="button"] div,
-    div[data-testid="stExpander"] div[role="button"] p {
-        color: #1a1a2e !important;
-    }
-    div[data-testid="stExpander"] div[role="button"]:hover span,
-    div[data-testid="stExpander"] div[role="button"]:hover div,
-    div[data-testid="stExpander"] div[role="button"]:hover p {
-        color: #1a1a2e !important;
-    }
-    /* 展开后的内容区 */
-    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {
-        background: #fafafa !important;
-        color: #1a1a2e !important;
-        border-top: 1px solid #e8e8e8 !important;
-    }
-    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] p,
-    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] span,
-    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] label {
-        color: #1a1a2e !important;
-    }
-
-    /* Tab 标签 */
-    .stTabs [data-baseweb="tab"] { color: #5a5a6e !important; background: transparent !important; }
-    .stTabs [aria-selected="true"] {
-        color: #e05a00 !important; border-bottom-color: #e05a00 !important;
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        background: #ffffff !important; border-bottom: 1px solid #e8e8e8 !important;
-    }
-    .stTabs [data-baseweb="tab-panel"] {
-        background: #ffffff !important; border: 1px solid #e8e8e8 !important;
-        border-top: none !important; padding: 1rem !important;
-    }
-
-    /* 下载按钮 */
-    div[data-testid="stDownloadButton"] button {
-        background: #ffffff !important; border: 1px solid #e05a00 !important;
-        color: #e05a00 !important; font-weight: 600 !important;
-    }
-    div[data-testid="stDownloadButton"] button:hover {
-        background: #fff5eb !important; border-color: #c54d00 !important;
-        color: #c54d00 !important;
-    }
-
-    /* 文本输入 */
-    input[data-testid="stTextInputRootElement"] input, .stTextInput input {
-        background: #ffffff !important; border-color: #d0d0d8 !important;
-        color: #1a1a2e !important;
-    }
-    .stTextInput input:focus {
-        border-color: #e05a00 !important;
-        box-shadow: 0 0 0 2px rgba(224,90,0,0.15) !important;
-    }
-    .stTextInput label { color: #3a3a4a !important; }
-
-    /* 日期输入 */
-    .stDateInput input {
-        background: #ffffff !important; border-color: #d0d0d8 !important;
-        color: #1a1a2e !important;
-    }
-    .stDateInput label { color: #3a3a4a !important; }
-
-    /* === 日历弹出层（Baseweb Datepicker）=== */
-    /* 弹出层容器 */
-    [data-baseweb="popover"] div[data-baseweb="calendar"] {
-        background: #ffffff !important;
-        border: 1px solid #d0d0d8 !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
-    }
-    /* 日历内所有元素基础色 */
-    [data-baseweb="calendar"] {
-        background: #ffffff !important;
-        color: #1a1a2e !important;
-    }
-    [data-baseweb="calendar"] * { color: #1a1a2e !important; }
-    /* 头部月份/年份 */
-    [data-baseweb="calendar-header"],
-    [data-baseweb="calendar"] [data-baseweb="calendar-header"] {
-        background: #ffffff !important;
-        color: #1a1a2e !important;
-    }
-    [data-baseweb="calendar"] button {
-        background: transparent !important;
-        color: #1a1a2e !important;
-    }
-    [data-baseweb="calendar"] button:hover {
-        background: #f5f5f8 !important;
-        color: #1a1a2e !important;
-    }
-    /* 星期表头 */
-    [data-baseweb="calendar"] [role="columnheader"] {
-        background: #ffffff !important;
-        color: #5a5a6e !important;
-    }
-    /* 日期格子 */
-    [data-baseweb="day"] {
-        background: #ffffff !important;
-        color: #1a1a2e !important;
-    }
-    [data-baseweb="day"]:hover {
-        background: #f5f0eb !important;
-        color: #1a1a2e !important;
-    }
-    /* 选中日期 */
-    [data-baseweb="day"][aria-selected="true"] {
-        background: #e05a00 !important;
-        color: #ffffff !important;
-    }
-    /* 高亮日期 */
-    [data-baseweb="day-highlighted"] {
-        background: #f5f0eb !important;
-        color: #1a1a2e !important;
-    }
-    /* 禁用日期 */
-    [data-baseweb="day-disabled"] {
-        background: #f5f5f8 !important;
-        color: #b0b0b8 !important;
-    }
-    /* 今天标记 */
-    [data-baseweb="calendar"] [data-baseweb="day"][aria-label*="today"],
-    [data-baseweb="calendar"] [aria-current="date"] {
-        background: #fff5eb !important;
-        color: #e05a00 !important;
-    }
-    [data-baseweb="calendar"] [aria-current="date"] {
-        background: #fff5eb !important;
-        color: #e05a00 !important;
-    }
-
-    /* Selectbox 下拉 */
-    .stSelectbox > div > div {
-        background: #ffffff !important; border-color: #d0d0d8 !important;
-        color: #1a1a2e !important;
-    }
-    .stSelectbox label { color: #3a3a4a !important; }
-    div[data-baseweb="popover"] > div, div[data-baseweb="menu"],
-    ul[role="listbox"] {
-        background: #ffffff !important; border: 1px solid #d0d0d8 !important;
-    }
-    ul[role="listbox"] li, div[data-baseweb="option"] span { color: #1a1a2e !important; }
-    ul[role="listbox"] li:hover, div[data-baseweb="option"]:hover {
-        background: #f5f0eb !important;
-    }
-
-    /* 文本区域 */
-    .stTextArea textarea {
-        background: #ffffff !important; border-color: #d0d0d8 !important;
-        color: #1a1a2e !important;
-    }
-
-    .stCheckbox label, .stRadio label { color: #3a3a4a !important; }
-    hr { border-color: #e8e8e8 !important; }
-
-    div[data-testid="stAlert"] {
-        background: #f0f7ff !important; border-color: #b3d4fc !important; color: #1a4a7a !important;
-    }
-    div[data-testid="stSuccess"] {
-        background: #f0fff4 !important; border-color: #9ae6b4 !important; color: #22543d !important;
-    }
-    div[data-testid="stError"] {
-        background: #fff5f5 !important; border-color: #feb2b2 !important; color: #742a2a !important;
-    }
-    div[data-testid="stWarning"] {
-        background: #fffbeb !important; border-color: #fbd38d !important; color: #744210 !important;
-    }
-
-    code {
-        background: #f5f5f8 !important; color: #e05a00 !important;
-        border: 1px solid #e8e8e8 !important;
-    }
-    pre { background: #f8f8fa !important; border: 1px solid #e8e8e8 !important; }
-
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #f0f2f5 !important; }
-    ::-webkit-scrollbar-thumb { background: #c0c0c8 !important; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a0a0a8 !important; }
-
-    /* 指标卡片 */
-    div[data-testid="stMetric"] {
-        background: #ffffff !important; border: 1px solid #e8e8e8 !important;
-        border-radius: 8px !important; padding: 0.8rem !important;
-    }
-
-    /* 侧边栏主题切换按钮 */
-    button[data-testid="theme-toggle-btn"] {
-        background: #ffffff !important;
-        border: 1px solid #d0d0d8 !important;
-        color: #1a1a2e !important;
-        width: 100% !important;
-        padding: 8px !important;
-        border-radius: 8px !important;
-        font-size: 1.2rem !important;
-        cursor: pointer !important;
-        transition: all 0.2s ease !important;
-    }
-    button[data-testid="theme-toggle-btn"]:hover {
-        background: #f5f5f8 !important;
-        border-color: #e05a00 !important;
-    }
-    </style>
-    """
+def _get_theme() -> dict:
+    """获取当前主题配色"""
+    return _THEMES.get(st.session_state.get("theme", "dark"), _THEMES["dark"])
 
 
-def _get_dark_css() -> str:
-    """Return CSS for dark theme"""
-    return """
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+def _render_theme_css() -> None:
+    """渲染主题 CSS：CSS 变量 + 精确 data-testid 选择器，适配所有组件。"""
+    theme = _get_theme()
+    st.markdown(
+        f"""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
-    #MainMenu, footer, div[data-testid="stDecoration"],
-    div[data-testid="stStatusWidget"], div[data-testid="stToolbarActions"],
-    div[data-testid="stAppDeployButton"], span[data-testid="stMainMenu"] { 
-        display: none !important; 
-    }
-    header[data-testid="stHeader"] {
-        background: transparent !important; box-shadow: none !important;
-    }
-    button[data-testid="stExpandSidebarButton"],
-    button[data-testid="stSidebarCollapseButton"],
-    button[data-testid="collapsedControl"],
-    [data-testid="stSidebarCollapsedControl"] {
-        display: flex !important; visibility: visible !important; opacity: 1 !important;
-    }
+        /* ── CSS 变量（两个主题共用同一套变量名） ── */
+        :root {{
+            --bg: {theme['bg']};
+            --sidebar-bg: {theme['sidebar_bg']};
+            --text: {theme['text']};
+            --text-secondary: {theme['text_secondary']};
+            --border: {theme['border']};
+            --input-bg: {theme['input_bg']};
+            --input-border: {theme['input_border']};
+            --button-secondary-bg: {theme['button_secondary_bg']};
+            --button-secondary-border: {theme['button_secondary_border']};
+            --button-secondary-hover: {theme['button_secondary_hover']};
+        }}
 
-    html, body, [class*="css"] { font-family: 'Inter', -apple-system, sans-serif; }
-    .stApp { background: #0a0a0a !important; }
-    section[data-testid="stSidebar"] {
-        background: #0f0f0f !important; border-right: 1px solid #1a1a1a !important;
-    }
-    .stMetric label { color: #888 !important; font-size: 0.8rem !important; }
-    .stMetric [data-testid="stMetricValue"] {
-        color: #ff5a1f !important; font-weight: 700 !important;
-    }
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #ff5a1f, #ff8c42) !important;
-    }
-    button[kind="primary"] {
-        background: linear-gradient(135deg, #ff5a1f, #ff8c42) !important;
-        border: none !important; font-weight: 700 !important;
-        letter-spacing: 0.05em !important;
-        box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
-    }
-    button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #e04d15, #ff5a1f) !important;
-        box-shadow: 0 6px 20px rgba(255,90,31,0.4) !important;
-        transform: translateY(-1px) !important;
-    }
-    button[kind="secondary"] {
-        background: #161616 !important; border: 1px solid #2a2a2a !important;
-        color: #ccc !important;
-    }
-    button[kind="secondary"]:hover {
-        background: #1e1e1e !important; border-color: #ff5a1f !important;
-        color: #ff5a1f !important;
-    }
-    .stExpander { border: 1px solid #222 !important; border-radius: 8px !important; }
-    .stTabs [data-baseweb="tab"] { color: #888 !important; }
-    .stTabs [aria-selected="true"] {
-        color: #ff5a1f !important; border-bottom-color: #ff5a1f !important;
-    }
-    div[data-testid="stDownloadButton"] button {
-        background: #1a1a2e !important; border: 1px solid #ff5a1f !important;
-        color: #ff5a1f !important;
-    }
-    input[data-testid="stTextInputRootElement"] input, .stTextInput input {
-        background: #161616 !important; border-color: #2a2a2a !important;
-        color: #f5f1eb !important;
-    }
-    .stTextInput input:focus {
-        border-color: #ff5a1f !important; box-shadow: 0 0 0 1px #ff5a1f !important;
-    }
-    .stDateInput input {
-        background: #161616 !important; border-color: #2a2a2a !important;
-        color: #f5f1eb !important;
-    }
+        /* Hide Streamlit chrome for clean video recording. */
+        #MainMenu, footer, div[data-testid="stDecoration"],
+        div[data-testid="stStatusWidget"], div[data-testid="stToolbarActions"],
+        div[data-testid="stAppDeployButton"], span[data-testid="stMainMenu"] {{ display: none !important; }}
+        header[data-testid="stHeader"] {{
+            background: transparent !important; box-shadow: none !important;
+        }}
+        button[data-testid="stExpandSidebarButton"],
+        button[data-testid="stSidebarCollapseButton"],
+        button[data-testid="collapsedControl"],
+        [data-testid="stSidebarCollapsedControl"] {{
+            display: flex !important; visibility: visible !important; opacity: 1 !important;
+        }}
 
-    /* 侧边栏主题切换按钮 */
-    button[data-testid="theme-toggle-btn"] {
-        background: #161616 !important;
-        border: 1px solid #2a2a2a !important;
-        color: #f5f1eb !important;
-        width: 100% !important;
-        padding: 8px !important;
-        border-radius: 8px !important;
-        font-size: 1.2rem !important;
-        cursor: pointer !important;
-        transition: all 0.2s ease !important;
-    }
-    button[data-testid="theme-toggle-btn"]:hover {
-        background: #1e1e1e !important;
-        border-color: #ff5a1f !important;
-    }
-    </style>
-    """
+        html, body, [class*="css"] {{
+            font-family: 'Inter', -apple-system, sans-serif;
+        }}
+        .stApp {{ background: var(--bg); }}
+        section[data-testid="stSidebar"] {{
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+        }}
+        .stMetric label {{ color: var(--text-secondary) !important; font-size: 0.8rem !important; }}
+        .stMetric [data-testid="stMetricValue"] {{
+            color: #ff5a1f !important; font-weight: 700 !important;
+        }}
+        .stProgress > div > div > div {{
+            background: linear-gradient(90deg, #ff5a1f, #ff8c42) !important;
+        }}
+        button[kind="primary"] {{
+            background: linear-gradient(135deg, #ff5a1f, #ff8c42) !important;
+            border: none !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.05em !important;
+            box-shadow: 0 4px 15px rgba(255,90,31,0.3) !important;
+            transition: all 0.2s ease !important;
+        }}
+        button[kind="primary"]:hover {{
+            background: linear-gradient(135deg, #e04d15, #ff5a1f) !important;
+            box-shadow: 0 6px 20px rgba(255,90,31,0.4) !important;
+            transform: translateY(-1px) !important;
+        }}
+        /* Secondary buttons (history items) */
+        button[kind="secondary"] {{
+            background: var(--button-secondary-bg) !important;
+            border: 1px solid var(--button-secondary-border) !important;
+            color: var(--text) !important;
+            transition: all 0.2s ease !important;
+        }}
+        button[kind="secondary"]:hover {{
+            background: var(--button-secondary-hover) !important;
+            border-color: #ff5a1f !important;
+            color: #ff5a1f !important;
+        }}
+
+        /* ── Expander（summary 选择器，完美覆盖折叠/展开/hover 所有状态）── */
+        .stExpander {{
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+            background: var(--sidebar-bg) !important;
+        }}
+        .stExpander summary {{
+            background: var(--sidebar-bg) !important;
+            color: var(--text) !important;
+        }}
+        .stExpander summary:hover {{
+            background: var(--bg) !important;
+        }}
+        .stExpander [data-testid="stExpanderDetails"] {{
+            background: var(--bg) !important;
+        }}
+        .stExpander [data-testid="stExpanderDetails"] p,
+        .stExpander [data-testid="stExpanderDetails"] li,
+        .stExpander [data-testid="stExpanderDetails"] span,
+        .stExpander [data-testid="stExpanderDetails"] label {{
+            color: var(--text) !important;
+        }}
+
+        /* ── Tabs ── */
+        .stTabs [data-baseweb="tab"] {{
+            color: var(--text-secondary) !important;
+        }}
+        .stTabs [aria-selected="true"] {{
+            color: #ff5a1f !important;
+            border-bottom-color: #ff5a1f !important;
+        }}
+        .stTabs [data-baseweb="tab-list"] {{
+            background: var(--sidebar-bg) !important;
+            border-bottom: 1px solid var(--border) !important;
+        }}
+        .stTabs [data-baseweb="tab-panel"] {{
+            background: var(--bg) !important;
+            border: 1px solid var(--border) !important;
+            border-top: none !important;
+            padding: 1rem !important;
+        }}
+
+        /* ── Download button ── */
+        div[data-testid="stDownloadButton"] button {{
+            background: var(--sidebar-bg) !important;
+            border: 1px solid #ff5a1f !important;
+            color: #ff5a1f !important;
+            font-weight: 600 !important;
+        }}
+
+        /* ── Text input ── */
+        input[data-testid="stTextInputRootElement"] input, .stTextInput input {{
+            background: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }}
+        .stTextInput input:focus {{
+            border-color: #ff5a1f !important;
+            box-shadow: 0 0 0 1px #ff5a1f !important;
+        }}
+        .stTextInput label {{ color: var(--text) !important; }}
+
+        /* ── Date input ── */
+        .stDateInput input {{
+            background: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }}
+        .stDateInput label {{ color: var(--text) !important; }}
+
+        /* ── Calendar popup (Baseweb Datepicker) ── */
+        [data-baseweb="popover"] div[data-baseweb="calendar"] {{
+            background: var(--bg) !important;
+            border: 1px solid var(--input-border) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+        }}
+        [data-baseweb="calendar"] {{
+            background: var(--bg) !important;
+            color: var(--text) !important;
+        }}
+        [data-baseweb="calendar"] * {{ color: var(--text) !important; }}
+        [data-baseweb="calendar-header"] {{ background: var(--bg) !important; }}
+        [data-baseweb="calendar"] button {{
+            background: transparent !important;
+            color: var(--text) !important;
+        }}
+        [data-baseweb="calendar"] button:hover {{
+            background: var(--bg) !important;
+            color: var(--text) !important;
+        }}
+        [data-baseweb="calendar"] [role="columnheader"] {{
+            background: var(--bg) !important;
+            color: var(--text-secondary) !important;
+        }}
+        [data-baseweb="day"] {{
+            background: var(--bg) !important;
+            color: var(--text) !important;
+        }}
+        [data-baseweb="day"]:hover {{
+            background: var(--button-secondary-hover) !important;
+            color: var(--text) !important;
+        }}
+        [data-baseweb="day"][aria-selected="true"] {{
+            background: #ff5a1f !important;
+            color: #ffffff !important;
+        }}
+        [data-baseweb="day"][aria-selected="true"]:hover {{
+            background: #e04d15 !important;
+        }}
+        [data-baseweb="day-highlighted"] {{
+            background: var(--button-secondary-hover) !important;
+        }}
+        [data-baseweb="day-disabled"] {{
+            background: var(--button-secondary_bg) !important;
+            color: var(--text-secondary) !important;
+        }}
+        [data-baseweb="calendar"] [aria-current="date"] {{
+            background: rgba(255, 90, 31, 0.1) !important;
+            color: #ff5a1f !important;
+        }}
+
+        /* ── Selectbox dropdown ── */
+        .stSelectbox > div > div {{
+            background: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }}
+        .stSelectbox label {{ color: var(--text) !important; }}
+        div[data-baseweb="popover"] > div, div[data-baseweb="menu"],
+        ul[role="listbox"] {{
+            background: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
+        }}
+        ul[role="listbox"] li, div[data-baseweb="option"] span {{ color: var(--text) !important; }}
+        ul[role="listbox"] li:hover, div[data-baseweb="option"]:hover {{
+            background: var(--button-secondary-hover) !important;
+        }}
+
+        /* ── Textarea ── */
+        .stTextArea textarea {{
+            background: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }}
+
+        /* ── Widget labels & markdown ── */
+        div[data-testid="stWidgetLabel"] label,
+        div[data-testid="stMarkdown"] p,
+        div[data-testid="stMarkdown"] h1,
+        div[data-testid="stMarkdown"] h2,
+        div[data-testid="stMarkdown"] h3,
+        div[data-testid="stCaption"] {{
+            color: var(--text) !important;
+        }}
+        div[data-testid="stMarkdown"] {{ color: var(--text) !important; }}
+        div[data-testid="stExpander"] [data-testid="stMarkdown"] {{ color: var(--text) !important; }}
+        div[data-testid="stTabs"] [data-testid="stMarkdown"] {{ color: var(--text) !important; }}
+
+        /* ── Placeholder ── */
+        div[data-testid="stTextInputRootElement"] input::placeholder,
+        div[data-testid="stDateInput"] input::placeholder {{
+            color: var(--text-secondary) !important;
+        }}
+
+        /* ── Checkbox / Radio ── */
+        div[data-testid="stCheckbox"] label,
+        div[data-testid="stRadio"] label {{ color: var(--text) !important; }}
+
+        /* ── Sidebar inner component text ── */
+        section[data-testid="stSidebar"] .stMarkdown,
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3 {{
+            color: var(--text) !important;
+        }}
+
+        /* ── Alerts ── */
+        div[data-testid="stAlert"] {{
+            background: rgba(255,90,31,0.08) !important;
+            border-color: rgba(255,90,31,0.3) !important;
+            color: var(--text) !important;
+        }}
+        div[data-testid="stSuccess"] {{
+            background: rgba(34,197,94,0.08) !important;
+            border-color: rgba(34,197,94,0.3) !important;
+            color: var(--text) !important;
+        }}
+        div[data-testid="stError"] {{
+            background: rgba(239,68,68,0.08) !important;
+            border-color: rgba(239,68,68,0.3) !important;
+            color: var(--text) !important;
+        }}
+        div[data-testid="stWarning"] {{
+            background: rgba(234,179,8,0.08) !important;
+            border-color: rgba(234,179,8,0.3) !important;
+            color: var(--text) !important;
+        }}
+
+        /* ── Code ── */
+        code {{
+            background: var(--button-secondary-bg) !important;
+            color: #ff5a1f !important;
+            border: 1px solid var(--input-border) !important;
+        }}
+        pre {{
+            background: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
+        }}
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar {{ width: 8px; height: 8px; }}
+        ::-webkit-scrollbar-track {{ background: var(--bg) !important; }}
+        ::-webkit-scrollbar-thumb {{ background: var(--border) !important; border-radius: 4px; }}
+        ::-webkit-scrollbar-thumb:hover {{ background: var(--text-secondary) !important; }}
+
+        /* ── Metric cards ── */
+        div[data-testid="stMetric"] {{
+            background: var(--bg) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+            padding: 0.8rem !important;
+        }}
+
+        /* ── Sidebar theme toggle button ── */
+        button[data-testid="theme-toggle-btn"] {{
+            background: var(--button-secondary-bg) !important;
+            border: 1px solid var(--button-secondary-border) !important;
+            color: var(--text) !important;
+            width: 100% !important;
+            padding: 8px !important;
+            border-radius: 8px !important;
+            font-size: 1.2rem !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }}
+        button[data-testid="theme-toggle-btn"]:hover {{
+            background: var(--button-secondary-hover) !important;
+            border-color: #ff5a1f !important;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
-# Apply theme CSS
-if st.session_state["theme"] == "light":
-    st.markdown(_get_light_css(), unsafe_allow_html=True)
-else:
-    st.markdown(_get_dark_css(), unsafe_allow_html=True)
+# ── Render theme CSS ─────────────────────────────────────────────────────────
+
+_render_theme_css()
 
 
 # ── Build config ─────────────────────────────────────────────────────────────
@@ -456,14 +444,13 @@ def _build_config() -> dict:
 
 with st.sidebar:
     render_sidebar()
-    # 主题切换按钮（仅图标，位于侧边栏底部）
+    # 主题切换按钮：仅图标，位于侧边栏底部
     theme = st.session_state["theme"]
     toggle_icon = "☀️" if theme == "dark" else "🌙"
     toggle_help = "切换到明亮模式" if theme == "dark" else "切换到暗黑模式"
-    if st.button(toggle_icon, key="theme_toggle", use_container_width=True, help=toggle_help):
+    if st.button(toggle_icon, key="theme_toggle-btn", use_container_width=True, help=toggle_help):
         new_theme = "light" if theme == "dark" else "dark"
         st.session_state["theme"] = new_theme
-        # 存入 URL 参数，刷新页面也能保持主题
         st.query_params["theme"] = new_theme
         st.rerun()
 
@@ -537,44 +524,48 @@ elif tracker and tracker.error:
         st.rerun()
 
 else:
-    theme = st.session_state["theme"]
-    if theme == "light":
-        text_color = "#1a1a2e"
-        muted_color = "#5a5a6e"
-        border_color = "#d9d9d9"
-        top_border_color = "#e8e8e8"
-        card_bg = "#ffffff"
-    else:
-        text_color = "#f5f1eb"
-        muted_color = "#888888"
-        border_color = "#222222"
-        top_border_color = "#1a1a1a"
-        card_bg = "#1a1a2e"
-
+    # 首页欢迎区，使用 CSS 变量动态配色
     st.markdown(
-        f"""
-        <div style="display:flex; flex-direction:column; align-items:center; 
-                     justify-content:center; min-height:60vh; text-align:center;">
-            <div style="font-size:4rem; margin-bottom:1rem;">📈</div>
-            <div style="font-size:2.5rem; font-weight:900; margin-bottom:0.5rem;">
-                <span style="color:#e05a00;">Trading</span>
-                <span style="color:{text_color};">Agents</span>
-                <span style="color:{text_color};">-</span>
-                <span style="color:#e05a00;">Astock</span>
+        """
+        <div style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+        ">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📈</div>
+            <div style="
+                font-size: 2.5rem;
+                font-weight: 900;
+                margin-bottom: 0.5rem;
+            ">
+                <span style="color: #ff5a1f;">Trading</span><span style="color: var(--text);">Agents</span><span style="color: var(--text);">-</span><span style="color: #ff5a1f;">Astock</span>
             </div>
-            <div style="color:{muted_color}; font-size:1.1rem; max-width:500px; line-height:1.6;">
+            <div style="color: var(--text-secondary); font-size: 1.1rem; max-width: 500px; line-height: 1.6;">
                 A股多Agent投研分析系统<br>
                 7位AI分析师 → 质量门控 → 多空辩论 → 风控评估 → 最终决策
             </div>
-            <div style="margin-top:2rem; padding:1rem 2rem; background:{card_bg};
-                        border:1px solid {border_color}; border-radius:12px;
-                        color:{muted_color}; font-size:0.9rem;
-                        box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+            <div style="
+                margin-top: 2rem;
+                padding: 1rem 2rem;
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+            ">
                 ← 在左侧输入股票代码，开始分析
             </div>
-            <div style="margin-top:2.5rem; padding:0.8rem 1.5rem; color:{muted_color};
-                        font-size:0.75rem; max-width:500px; line-height:1.6;
-                        border-top:1px solid {top_border_color};">
+            <div style="
+                margin-top: 2.5rem;
+                padding: 0.8rem 1.5rem;
+                color: var(--text-secondary);
+                font-size: 0.75rem;
+                max-width: 500px;
+                line-height: 1.6;
+                border-top: 1px solid var(--border);
+            ">
                 ⚠️ 本项目仅供学习研究与技术演示，不构成任何投资建议。<br>
                 投资决策请咨询持牌专业机构。作者不对使用本工具产生的任何损失承担责任。
             </div>

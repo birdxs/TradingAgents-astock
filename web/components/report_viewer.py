@@ -11,34 +11,8 @@ from web.pdf_export import generate_markdown, generate_pdf
 from web.stock_display import normalize_stock_mentions, stock_display_label
 
 
-def _get_theme_colors() -> dict:
-    """Get colors based on current theme."""
-    theme = st.session_state.get("theme", "dark")
-    if theme == "light":
-        return {
-            "card_bg": "#ffffff",
-            "card_border": "#d9d9d9",
-            "text": "#1a1a2e",
-            "muted": "#5a5a6e",
-            "shadow": "rgba(0,0,0,0.08)",
-            "expander_bg": "#ffffff",
-            "expander_hover": "#f5f5f8",
-            "expander_text": "#1a1a2e",
-        }
-    return {
-        "card_bg": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-        "card_border": "#333333",
-        "text": "#f5f1eb",
-        "muted": "#888888",
-        "shadow": "rgba(0,0,0,0.3)",
-        "expander_bg": "#0f0f0f",
-        "expander_hover": "#1a1a1a",
-        "expander_text": "#f5f1eb",
-    }
-
-
 def _strip_think(text: str) -> str:
-    return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
+    return re.sub(r"\s*", "", text, flags=re.DOTALL).strip()
 
 
 def _signal_style(signal: str) -> tuple[str, str]:
@@ -78,38 +52,35 @@ def render_report(
     signal: str,
     elapsed: float | None = None,
 ) -> None:
-    """Render the full analysis report."""
-    colors = _get_theme_colors()
+    """Render the full analysis report.
+    
+    所有颜色通过 CSS 变量（var(--bg), var(--sidebar-bg), var(--text), var(--text-secondary)）动态适配主题，
+    信号卡片使用渐变背景 linear-gradient(var(--sidebar-bg), var(--bg)) 自动匹配两个主题。
+    """
     color, cn_signal = _signal_style(signal)
     ticker_label = stock_display_label(ticker, final_state)
 
     stats_html = ""
     if elapsed is not None:
         m, s = divmod(int(elapsed), 60)
-        stats_html = f'<div style="font-size:0.9rem; color:{colors["muted"]}; margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
+        stats_html = f'<div style="font-size:0.9rem; color:var(--text-secondary); margin-top:0.3rem;">耗时 {m}:{s:02d}</div>'
 
-    theme = st.session_state.get("theme", "dark")
-    if theme == "light":
-        bg_style = f"background: {colors['card_bg']};"
-    else:
-        bg_style = f"background: {colors['card_bg']};"
-
+    # 信号卡片：CSS 变量渐变背景，自动适配明亮/暗黑主题
     st.markdown(
         f"""
         <div style="
-            {bg_style}
-            border: 1px solid {colors["card_border"]};
+            background: linear-gradient(135deg, var(--sidebar-bg) 0%, var(--bg) 100%);
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 2rem;
             text-align: center;
             margin: 1rem 0 2rem;
-            box-shadow: 0 4px 12px {colors["shadow"]};
         ">
-            <div style="font-size:0.9rem; color:{colors["muted"]}; letter-spacing:2px;">TRADING SIGNAL</div>
+            <div style="font-size:0.9rem; color:var(--text-secondary); letter-spacing:2px;">TRADING SIGNAL</div>
             <div style="font-size:3.5rem; font-weight:900; color:{color}; margin:0.3rem 0;">
                 {signal.upper()}
             </div>
-            <div style="font-size:1.2rem; color:{colors["text"]};">
+            <div style="font-size:1.2rem; color:var(--text);">
                 {ticker_label} · {trade_date}
             </div>
             {stats_html}

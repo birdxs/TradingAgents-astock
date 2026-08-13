@@ -35,22 +35,6 @@ _PROVIDER_DISPLAY = [name for name, _ in _PROVIDERS]
 _PROVIDER_KEYS = [key for _, key in _PROVIDERS]
 
 
-def _get_theme_colors() -> dict:
-    """Get colors based on current theme."""
-    theme = st.session_state.get("theme", "dark")
-    if theme == "light":
-        return {
-            "text": "#1a1a2e",
-            "muted": "#5a5a6e",
-            "link": "#e05a00",
-        }
-    return {
-        "text": "#f5f1eb",
-        "muted": "#888888",
-        "link": "#ff5a1f",
-    }
-
-
 def _resolve_user_input(raw: str) -> tuple[str, str | None]:
     from tradingagents.dataflows.a_stock import resolve_ticker
     try:
@@ -176,21 +160,24 @@ def _render_llm_config() -> None:
 
 
 def render_sidebar() -> None:
-    """Render the sidebar with input controls and history."""
-    colors = _get_theme_colors()
+    """Render the sidebar with input controls and history.
+    
+    所有颜色通过 CSS 变量（var(--text), var(--text-secondary)）动态适配主题，
+    组件代码不感知当前是明亮还是暗黑模式。
+    """
 
     st.markdown(
-        f"""
+        """
         <div style="text-align:center; margin-bottom:1.5rem;">
-            <span style="font-size:2rem; font-weight:800; color:#e05a00;">Trading</span>
-            <span style="font-size:2rem; font-weight:800; color:{colors["text"]};">Agents</span>
-            <span style="font-size:2rem; font-weight:800; color:{colors["text"]};">-</span>
-            <span style="font-size:2rem; font-weight:800; color:#e05a00;">Astock</span>
-            <div style="font-size:0.85rem; color:{colors["muted"]}; margin-top:0.2rem;">
+            <span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Trading</span>
+            <span style="font-size:2rem; font-weight:800; color:var(--text);">Agents</span>
+            <span style="font-size:2rem; font-weight:800; color:var(--text);">-</span>
+            <span style="font-size:2rem; font-weight:800; color:#ff5a1f;">Astock</span>
+            <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.2rem;">
                 A股多Agent投研系统
             </div>
-            <div style="font-size:0.7rem; color:#888; margin-top:0.3rem;">
-                by <a href="https://github.com/simonlin1212" style="color:{colors["link"]}; text-decoration:none;">simonlin1212</a>
+            <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:0.3rem;">
+                by <a href="https://github.com/simonlin1212" style="color:#ff5a1f; text-decoration:none;">simonlin1212</a>
             </div>
         </div>
         """, unsafe_allow_html=True,
